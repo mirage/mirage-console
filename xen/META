@@ -1,0 +1,7 @@
+version = "0.9.9"
+description = "Logging console for Xen"
+archive(byte) = "mirage-console.cma"
+archive(byte, plugin) = "mirage-console.cma"
+archive(native) = "mirage-console.cmxa"
+archive(native, plugin) = "mirage-console.cmxs"
+exists_if = "mirage-console.cma"
