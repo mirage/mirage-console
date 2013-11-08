@@ -56,7 +56,8 @@ let rec write_all event cons buf off len =
     assert (left >= 0);
     if left = 0 then return ()
     else
-      lwt event = Activations.after cons.evtchn event in
+      Activations.after cons.evtchn event
+      >>= fun event ->
       write_all event cons buf (off+w) left
 
 let write cons buf off len =
