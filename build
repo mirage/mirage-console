@@ -3,10 +3,9 @@
 OS=${OS:-unix}
 OCAMLBUILD=ocamlbuild
 
-DEPS=
 case "$OS" in
-unix) DEPS="lwt.unix" ;;
-xen) DEPS="lwt" ;;
+unix) DEPS="mirage-types,lwt.unix" ;;
+xen) DEPS="mirage-types,lwt" ;;
 *) echo Unknown OS $OS; exit 1 ;;
 esac
 

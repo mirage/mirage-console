@@ -17,9 +17,15 @@
 open Lwt
 open Printf
 
+(* TODO everything connects to the same console for now *)
 (* TODO management service for logging *)
 type t = unit
+type id = string
 type 'a io = 'a Lwt.t
+type error = Invalid_console of string
+
+let connect _id = return (`Ok ())
+let disconnect () = return ()
 
 let write t buf off len = prerr_string (String.sub buf off len); flush stderr; len
 
