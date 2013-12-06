@@ -1,2 +1,3 @@
 0.9.9 (trunk):
+* Adapt to V1.CONSOLE interface.
 * Initial public release, based on mirage/mirage-platform#0.9.8

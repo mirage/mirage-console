@@ -15,34 +15,5 @@
  *)
 
 (** Text console input/output operations. *)
-
-(** Abstract type of a console instance. *)
-type t
-
-(** A blocking I/O operation *)
-type 'a io = 'a Lwt.t
-
-(** The default console, attached from the start of the program. *)
-val t : t
-
-(** [create ()] creates an additional console. Not implemented yet. *)
-val create : unit -> t
-
-(** [write t buf off len] writes up to [len] chars of [String.sub buf
-    off len] to the console [t] and returns the number of bytes
-    written. Raises {!Invalid_argument} if [len > buf - off]. *)
-val write : t -> string -> int -> int -> int
-
-(** [write_all t buf off len] is a thread that writes [String.sub buf
-    off len] to the console [t] and returns [len] when done. Raises
-    {!Invalid_argument} if [len > buf - off]. *)
-val write_all : t -> string -> int -> int -> int Lwt.t
-
-(** [log str] writes as much characters of [str] that can be written
-    in one write operation to the default console [t], then writes
-    "\r\n" to it. *)
-val log : string -> unit
-
-(** [log_s str] is a thread that writes [str ^ "\r\n"] in the default
-    console [t]. *)
-val log_s : string -> unit Lwt.t
+include V1.CONSOLE
+  with type 'a io = 'a Lwt.t
