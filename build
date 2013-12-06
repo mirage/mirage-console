@@ -16,8 +16,8 @@ B=_build/${OS}
 if [ "$1" = "true" ]; then
   ocamlfind remove mirage-console || true
   ocamlfind install mirage-console ${OS}/META \
-    $B/clock.cmo $B/clock.cmi $B/mirage-console.cma \
-    $B/mirage-console.a $B/clock.cmx $B/mirage-console.cmxa $B/mirage-console.cmxs
+    $B/console.cmo $B/console.cmi $B/mirage-console.cma \
+    $B/mirage-console.a $B/console.cmx $B/mirage-console.cmxa $B/mirage-console.cmxs
 elif [ "$1" = "test" ]; then
   ocamlbuild -use-ocamlfind -pkgs mirage-types,$DEPS -I ${OS} lib_test/portable.cmo
 fi
