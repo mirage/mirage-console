@@ -4,8 +4,8 @@ OS=${OS:-unix}
 OCAMLBUILD=ocamlbuild
 
 case "$OS" in
-unix) DEPS="mirage-types,lwt.unix" ;;
-xen) DEPS="mirage-types,mirage,io-page-xen" ;;
+unix) DEPS="mirage-types,mirage-unix" ;;
+xen) DEPS="mirage-types,mirage-xen,io-page-xen" ;;
 *) echo Unknown OS $OS; exit 1 ;;
 esac
 
