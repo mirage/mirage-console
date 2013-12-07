@@ -1,6 +1,6 @@
 version = "0.9.9"
 description = "Logging console for UNIX"
-requires = "lwt.unix"
+requires = "mirage-unix"
 archive(byte) = "mirage-console.cma"
 archive(byte, plugin) = "mirage-console.cma"
 archive(native) = "mirage-console.cmxa"

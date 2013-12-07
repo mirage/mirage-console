@@ -1,4 +1,5 @@
 version = "0.9.9"
+requires = "mirage-xen"
 description = "Logging console for Xen"
 archive(byte) = "mirage-console.cma"
 archive(byte, plugin) = "mirage-console.cma"
