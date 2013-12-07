@@ -13,8 +13,8 @@ ocamlbuild -use-ocamlfind -pkgs $DEPS ${OS}/mirage-console.cma ${OS}/mirage-cons
 
 B=_build/${OS}
 if [ "$1" = "true" ]; then
-  ocamlfind remove mirage-console || true
-  ocamlfind install mirage-console ${OS}/META \
+  ocamlfind remove mirage-console-${OS} || true
+  ocamlfind install mirage-console-${OS} ${OS}/META \
     $B/console.cmo $B/console.cmi $B/mirage-console.cma \
     $B/mirage-console.a $B/console.cmx $B/mirage-console.cmxa $B/mirage-console.cmxs
 elif [ "$1" = "test" ]; then

@@ -1,4 +1,5 @@
 0.9.9 (trunk):
+* Install separate libraries for `mirage-console-unix` and `mirage-console-xen`.
 * Update library dependencies for mirage-types-0.3.0
 * Adapt to V1.CONSOLE interface.
 * Initial public release, based on mirage/mirage-platform#0.9.8
