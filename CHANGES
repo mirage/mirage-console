@@ -1,3 +1,4 @@
 0.9.9 (trunk):
+* Update library dependencies for mirage-types-0.3.0
 * Adapt to V1.CONSOLE interface.
 * Initial public release, based on mirage/mirage-platform#0.9.8
