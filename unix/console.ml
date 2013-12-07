@@ -22,7 +22,7 @@ open Printf
 type t = unit
 type id = string
 type 'a io = 'a Lwt.t
-type error = Invalid_console of string
+type error = [ `Invalid_console of string ]
 
 let connect _id = return (`Ok ())
 let disconnect () = return ()
@@ -31,14 +31,16 @@ let write t buf off len = prerr_string (String.sub buf off len); flush stderr; l
 
 let create () : t = ()
 
-let write_all t buf off len = return (write t buf off len)
+let rec write_all t buf off len =
+  let w = write t buf off len in
+  if w < len then
+    write_all t buf (off+w) (len-w)
+  else return ()
 
 let create_additional_console () = return (create ())
 
-let t =  create ()
+let log t s = prerr_endline s 
 
-let log s = prerr_endline s 
-
-let log_s s =
+let log_s t s =
   let s = s ^ "\n" in
-  write_all t s 0 (String.length s) >>= fun (_:int) -> Lwt.return ()
+  write_all t s 0 (String.length s)

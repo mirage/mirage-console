@@ -30,11 +30,13 @@ type t = {
 
 type 'a io = 'a Lwt.t
 
+type error = [ `Invalid_console of string ]
+type id = string
 exception Internal_error of string
 
 let h = Eventchn.init ()
 
-let create () =
+let connect _id =
   let backend_id = 0 in
   let gnt = Gnt.console in
   let page = Start_info.console_start_page () in
@@ -45,9 +47,12 @@ let create () =
   let cons = { backend_id; gnt; ring; evtchn; waiters } in
   Eventchn.unmask h evtchn;
   Eventchn.notify h evtchn;
-  cons
+  return (`Ok cons)
 
-let rec write_all event cons buf off len =
+let disconnect _id =
+  return ()
+
+let rec write_all_low event cons buf off len =
   if len > String.length buf - off
   then Lwt.fail (Invalid_argument "len")
   else
@@ -59,7 +64,10 @@ let rec write_all event cons buf off len =
     else
       Activations.after cons.evtchn event
       >>= fun event ->
-      write_all event cons buf (off+w) left
+      write_all_low event cons buf (off+w) left
+
+let write_all cons buf off len = 
+  write_all_low Activations.program_start cons buf off len
 
 let write cons buf off len =
   if len > String.length buf - off then raise (Invalid_argument "len");
@@ -67,12 +75,10 @@ let write cons buf off len =
   Eventchn.notify h cons.evtchn;
   nb_written
 
-let t = create ()
-
-let log s =
+let log t s =
   let s = s ^ "\r\n" in
   let (_:int) = write t s 0 (String.length s) in ()
 
-let log_s s =
+let log_s t s =
   let s = s ^ "\r\n" in
-  write_all Activations.program_start t s 0 (String.length s)
+  write_all_low Activations.program_start t s 0 (String.length s)
