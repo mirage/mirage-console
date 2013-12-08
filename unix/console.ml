@@ -19,25 +19,22 @@ open Printf
 
 (* TODO everything connects to the same console for now *)
 (* TODO management service for logging *)
-type t = unit
+type t = { id: string }
 type id = string
 type 'a io = 'a Lwt.t
 type error = [ `Invalid_console of string ]
 
-let connect _id = return (`Ok ())
-let disconnect () = return ()
+let connect id = return (`Ok {id} )
+let disconnect _t = return ()
+let id {id} = id
 
 let write t buf off len = prerr_string (String.sub buf off len); flush stderr; len
-
-let create () : t = ()
 
 let rec write_all t buf off len =
   let w = write t buf off len in
   if w < len then
     write_all t buf (off+w) (len-w)
   else return ()
-
-let create_additional_console () = return (create ())
 
 let log t s = prerr_endline s 
 
