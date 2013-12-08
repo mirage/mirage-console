@@ -1,3 +1,6 @@
+1.0.1 (08-12-2013):
+* Set the type of `id` in the Xen console to `string`.
+
 1.0.0 (08-12-2013):
 * Adapt to mirage-types-0.4.0 interface.
 
