@@ -21,6 +21,7 @@ open OS
 module Gnttab = Gnt.Gnttab
 
 type t = {
+  id: string;
   backend_id: int;
   gnt: Gnt.gntref;
   ring: Cstruct.t;
@@ -35,8 +36,9 @@ type id = string
 exception Internal_error of string
 
 let h = Eventchn.init ()
+let id { id } = id
 
-let connect _id =
+let connect id =
   let backend_id = 0 in
   let gnt = Gnt.console in
   let page = Start_info.console_start_page () in
@@ -44,7 +46,7 @@ let connect _id =
   Console_ring.Ring.init ring; (* explicitly zero the ring *)
   let evtchn = Eventchn.of_int Start_info.((get ()).console_evtchn) in
   let waiters = Lwt_sequence.create () in
-  let cons = { backend_id; gnt; ring; evtchn; waiters } in
+  let cons = { id; backend_id; gnt; ring; evtchn; waiters } in
   Eventchn.unmask h evtchn;
   Eventchn.notify h evtchn;
   return (`Ok cons)

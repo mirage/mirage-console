@@ -1,4 +1,4 @@
-version = "0.9.9"
+version = "1.0.0"
 description = "Logging console for UNIX"
 requires = "mirage-unix"
 archive(byte) = "mirage-console.cma"
