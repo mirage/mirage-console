@@ -1,5 +1,5 @@
 version = "1.0.2"
-requires = "lwt mirage-xen io-page xen-grant xen-event"
+requires = "lwt mirage-xen io-page xen-gnt xen-evtchn"
 description = "Logging console for Xen"
 archive(byte) = "mirage-console.cma"
 archive(byte, plugin) = "mirage-console.cma"
