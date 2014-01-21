@@ -25,7 +25,7 @@ type t = {
   backend_id: int;
   gnt: Gnt.gntref;
   ring: Cstruct.t;
-  evtchn: Eventchn.t;
+  mutable evtchn: Eventchn.t;
   waiters: unit Lwt.u Lwt_sequence.t;
 }
 
@@ -44,9 +44,15 @@ let connect id =
   let page = Start_info.console_start_page () in
   let ring = Io_page.to_cstruct page in
   Console_ring.Ring.init ring; (* explicitly zero the ring *)
-  let evtchn = Eventchn.of_int Start_info.((get ()).console_evtchn) in
+  let get_evtchn () = 
+    let e = Eventchn.of_int Start_info.((get ()).console_evtchn) in
+    Eventchn.unmask h e;
+    e
+  in
+  let evtchn = get_evtchn () in
   let waiters = Lwt_sequence.create () in
   let cons = { id; backend_id; gnt; ring; evtchn; waiters } in
+  Sched.add_resume_hook (fun () -> cons.evtchn <- get_evtchn (); Lwt.return ());
   Eventchn.unmask h evtchn;
   Eventchn.notify h evtchn;
   return (`Ok cons)
