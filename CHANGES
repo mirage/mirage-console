@@ -1,3 +1,7 @@
+1.0.2 (01-02-2014):
+* [xen] Fix console on resume by reattaching the ring.
+* [xen] Switch to ocamlfind xen-{gnt,evtchn}.
+
 1.0.1 (08-12-2013):
 * Set the type of `id` in the Xen console to `string`.
 
