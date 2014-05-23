@@ -1,5 +1,5 @@
 XEN_OPAM_DEPENDS="xen-evtchn xen-gnt mirage-xen"
-COMMON_OPAM_DEPENDS="lwt cstruct mirage io-page mirage-types xenstore"
+COMMON_OPAM_DEPENDS="lwt cstruct mirage io-page mirage-types xenstore xenstore_transport"
 
 case "$XEN" in
 1) OPAM_DEPENDS="$COMMON_OPAM_DEPENDS $XEN_OPAM_DEPENDS";;
