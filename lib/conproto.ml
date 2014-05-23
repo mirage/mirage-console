@@ -23,6 +23,38 @@ module Output = struct
   let to_string _ = "pty"
 end
 
+module RingInfo = struct
+  type t = {
+    ref: int32;
+    event_channel: int;
+  }
+
+  let to_string t =
+    Printf.sprintf "{ ref = %ld; event_channel = %d }"
+    t.ref t.event_channel
+
+  let _ring_ref = "ring-ref"
+  let _port = "port"
+
+  let keys = [
+    _ring_ref;
+    _port;
+  ]
+
+  let to_assoc_list t = [
+    _ring_ref, Int32.to_string t.ref;
+    _port, string_of_int t.event_channel;
+  ]
+
+  let of_assoc_list l =
+    list l _ring_ref >>= fun x -> int32 x
+    >>= fun ref ->
+    list l _port >>= fun x -> int x
+    >>= fun event_channel ->
+    `OK { ref; event_channel }
+end
+
+
 module State = struct
   type t = Initialising | InitWait | Initialised | Connected | Closing | Closed
   let table = [

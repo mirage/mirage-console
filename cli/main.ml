@@ -22,6 +22,18 @@ open Xs_protocol
 module Client = Xs_client_lwt.Client(Xs_transport_lwt_unix_client)
 open Client
 
+let name =
+  let sanitise x =
+    let x' = String.length x in
+    let y = String.create x' in
+    for i = 0 to x' - 1 do
+      y.[i] <- match x.[i] with
+               | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' -> x.[i]
+               | _ -> '_'
+    done;
+    y in
+ sanitise (Filename.basename Sys.argv.(0))
+
 module Common = struct
   type t = {
     verbose: bool;
@@ -76,7 +88,8 @@ let find_free_console client vm =
   lwt used = immediate client (fun xs -> try_lwt directory xs (Printf.sprintf "/local/domain/%d/device/console" vm) with Xs_protocol.Enoent _ -> return []) in
   let free =
     used
-    |> List.map int_of_string
+    |> List.map (fun x -> try Some (int_of_string x) with _ -> None)
+    |> List.fold_left (fun acc this -> match this with Some x -> x :: acc | None -> acc) []
     |> List.fold_left max 0 (* console 0 is handled specially *)
     |> (fun x -> x + 1) in
   return free
@@ -89,17 +102,38 @@ let main (vm: string) =
     | None -> fail (Failure (Printf.sprintf "Failed to find VM %s" vm)) in
   Printf.fprintf stderr "Operating on VM domain id: %d\n%!" vm;
   lwt devid = find_free_console client vm in
-  Printf.fprintf stderr "Creating device %d (linux device /dev/tty%d)\n%!"
+  Printf.fprintf stderr "Creating device %d (by default linux device /dev/hvc%d unless udev renames it)\n%!"
     devid (devid);
+  let device = vm, devid in
 
-  let c = Connection.make ~frontend_domid:vm ~virtual_device:devid () in
-  transaction client (fun xs ->
-    Lwt_list.iter_s (fun (acl, (k, v)) ->
-      lwt () = write xs k v in
-      lwt () = setperms xs k acl in
-      return ()
-    ) (Connection.to_assoc_list c)
-  )
+  let module M = Conback.Make(Unix_activations)(Client)(Console) in
+
+  (* If we're asked to shutdown cleanly, first initiate a hot-unplug.
+     If we're asked again, be more aggressive. *)
+  let already_asked = ref false in
+  let shutdown_signal _ =
+    if not(!already_asked) then begin
+      already_asked := true;
+      Printf.fprintf stderr "Received signal, requesting hot-unplug.\n%!";
+      let (_: unit Lwt.t) = M.request_close name device in
+      ()
+    end else begin
+      Printf.fprintf stderr "Received signal again, tearing down the backend.\n%!";
+      let (_: unit Lwt.t) = M.force_close device in
+      ()
+    end in
+  List.iter
+    (fun signal ->
+      let (_: Lwt_unix.signal_handler_id) = Lwt_unix.on_signal signal shutdown_signal in
+      ()
+    ) [ Sys.sigint; Sys.sigterm ];
+
+  lwt () = M.create name device in
+  lwt stats = M.run "" name device in
+  Printf.fprintf stderr "# console stats\n";
+  Printf.fprintf stderr "Total read:     %d\n" stats.Conback.total_read;
+  Printf.fprintf stderr "Total written:  %d\n" stats.Conback.total_write;
+  M.destroy name device
 
 let connect (common: Common.t) (vm: string) =
   match vm with

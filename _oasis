@@ -11,15 +11,28 @@ Flag xen
   Description:        true to build Xen library
   Default:            false
 
-Library mirage_console_protocol
+Flag miragexen
+  Description:        true to build Xen kernelspace console
+  Default:            false
+
+Library mirage_console
   CompiledObject:     best
   Path:               lib
   Findlibname:        mirage-console
   Modules:            Conproto
   BuildDepends:       lwt, xenstore
 
-Library mirage_console_xen
+Library mirage_console_backend
   Build$:             flag(xen)
+  CompiledObject:     best
+  Path:               backend
+  Findlibparent:      mirage_console
+  Findlibname:        backend
+  Modules:            Conback
+  BuildDepends:       lwt, xenstore, mirage-console, xen-gnt, xen-evtchn, mirage-types, mirage-types.lwt, shared-memory-ring, shared-memory-ring.console
+
+Library mirage_console_xen
+  Build$:             flag(miragexen)
   CompiledObject:     best
   Path:               xen
   Findlibname:        mirage-console-xen
@@ -33,12 +46,13 @@ Library mirage_console_unix
   Modules:            Console
   BuildDepends:       lwt, mirage-types
 
-Executable mirage_console
+Executable mirage_console_cli
+  Build$:             flag(xen)
   CompiledObject:     best
   Install:            false
   Path:               cli
   MainIs:             main.ml
-  BuildDepends:       mirage-console, xenstore, xenstore.client, xenstore_transport, xenstore_transport.lwt, lwt, lwt.unix, cmdliner
+  BuildDepends:       mirage-console, mirage-console-unix, io-page.unix, io-page, xen-evtchn, xen-evtchn.unix, xen-evtchn.unix.activations, xen-gnt.unix, xen-gnt, mirage-console.backend, xenstore, xenstore.client, xenstore_transport, xenstore_transport.lwt, lwt, lwt.unix, cmdliner
 
 Executable portable
   CompiledObject:     best
