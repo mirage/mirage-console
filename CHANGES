@@ -1,5 +1,7 @@
 trunk (unreleased)
 * enable travis (for both xen and unix cases)
+* fix dependencies: drop mirage-{xen,unix}; keep dependencies on implementation
+  libraries and mirage-types
 
 1.0.2 (01-02-2014):
 * [xen] Fix console on resume by reattaching the ring.
