@@ -1,10 +1,9 @@
-XEN_OPAM_DEPENDS="mirage-xen xen-evtchn xen-gnt xenstore"
-UNIX_OPAM_DEPENDS="mirage-unix"
-BASE_OPAM_DEPENDS="lwt cstruct mirage io-page mirage-types"
+XEN_OPAM_DEPENDS="xenstore xen-evtchn xen-gnt mirage-xen"
+COMMON_OPAM_DEPENDS="lwt cstruct mirage io-page mirage-types"
 
 case "$XEN" in
-1) OPAM_DEPENDS="$BASE_OPAM_DEPENDS $XEN_OPAM_DEPENDS";;
-*) OPAM_DEPENDS="$BASE_OPAM_DEPENDS $UNIX_OPAM_DEPENDS";;
+1) OPAM_DEPENDS="$COMMON_OPAM_DEPENDS $XEN_OPAM_DEPENDS";;
+*) OPAM_DEPENDS="$COMMON_OPAM_DEPENDS";;
 esac
 
 case "$OCAML_VERSION,$OPAM_VERSION" in
