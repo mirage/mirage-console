@@ -15,6 +15,4 @@
  *)
 
 (** Text console input/output operations. *)
-include V1.CONSOLE
-  with type 'a io = 'a Lwt.t
-  and type id = string
+include S.CONSOLE

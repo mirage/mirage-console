@@ -24,8 +24,8 @@ Library mirage_console
   CompiledObject:     best
   Path:               lib
   Findlibname:        mirage-console
-  Modules:            Conproto
-  BuildDepends:       lwt, xenstore
+  Modules:            Conproto, S
+  BuildDepends:       lwt, xenstore, mirage-types, mirage-types.lwt
 
 Library mirage_console_backend
   Build$:             flag(xen)
@@ -42,7 +42,7 @@ Library mirage_console_xen
   Path:               xen
   Findlibname:        mirage-console-xen
   Modules:            Console
-  BuildDepends:       lwt, mirage-types, mirage-xen, io-page, xen-gnt, xen-evtchn
+  BuildDepends:       lwt, mirage-types, mirage-xen, io-page, xen-gnt, xen-evtchn, mirage-console
 
 Library mirage_console_unix
   Build$:             flag(unix)
@@ -50,7 +50,7 @@ Library mirage_console_unix
   Path:               unix
   Findlibname:        mirage-console-unix
   Modules:            Console
-  BuildDepends:       lwt, mirage-types
+  BuildDepends:       lwt, mirage-types, mirage-console
 
 Executable mirage_console_cli
   Build$:             flag(xen) && flag(unix)

@@ -1,5 +1,5 @@
 (*
- * Copyright (c) 2010-2013 Anil Madhavapeddy <anil@recoil.org>
+ * Copyright (c) 2012-14 Citrix Systems Inc
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,5 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-(** Text console input/output operations. *)
-include S.CONSOLE
+ module type CONSOLE = sig
+   include V1_LWT.CONSOLE
+     with type 'a io = 'a Lwt.t
+     with type id = string
+end
