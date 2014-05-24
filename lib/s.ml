@@ -1,5 +1,5 @@
 (*
- * Copyright (c) 2012-14 Citrix Systems Inc
+ * Copyright (c) 2014 Citrix Systems Inc
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,4 +18,9 @@
    include V1_LWT.CONSOLE
      with type 'a io = 'a Lwt.t
      with type id = string
+
+     val read : t -> string -> int -> int -> int Lwt.t
+     (** [read t buf off len] reads up to [len] chars of [String.sub buf
+         off len] from the console [t] and returns the number of bytes
+         read. Raises {!Invalid_argument} if [len > buf - off]. *)
 end

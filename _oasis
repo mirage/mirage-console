@@ -50,7 +50,7 @@ Library mirage_console_unix
   Path:               unix
   Findlibname:        mirage-console-unix
   Modules:            Console
-  BuildDepends:       lwt, mirage-types, mirage-console
+  BuildDepends:       lwt, lwt.unix, mirage-types, mirage-console
 
 Executable mirage_console_cli
   Build$:             flag(xen) && flag(unix)

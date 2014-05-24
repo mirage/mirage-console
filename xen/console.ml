@@ -44,7 +44,7 @@ let connect id =
   let page = Start_info.console_start_page () in
   let ring = Io_page.to_cstruct page in
   Console_ring.Ring.init ring; (* explicitly zero the ring *)
-  let get_evtchn () = 
+  let get_evtchn () =
     let e = Eventchn.of_int Start_info.((get ()).console_evtchn) in
     Eventchn.unmask h e;
     e
@@ -74,7 +74,7 @@ let rec write_all_low event cons buf off len =
       >>= fun event ->
       write_all_low event cons buf (off+w) left
 
-let write_all cons buf off len = 
+let write_all cons buf off len =
   write_all_low Activations.program_start cons buf off len
 
 let write cons buf off len =
@@ -82,6 +82,14 @@ let write cons buf off len =
   let nb_written = Console_ring.Ring.Front.unsafe_write cons.ring buf off len in
   Eventchn.notify h cons.evtchn;
   nb_written
+
+let read cons buf off len =
+  if len > String.length buf - off then fail (Invalid_argument "len")
+  else begin
+    let nb_read = Console_ring.Ring.Front.unsafe_read cons.ring buf off len in
+    Eventchn.notify h cons.evtchn;
+    return nb_read
+  end
 
 let log t s =
   let s = s ^ "\r\n" in

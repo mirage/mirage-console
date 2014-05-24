@@ -62,23 +62,43 @@ module ConsoleError = struct
 end
 
 
-module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: V1_LWT.CONSOLE with type id := string) = struct
+module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: S.CONSOLE) = struct
 
   let service_thread t c stats =
 
     (* XXX: remove copies when shared-memory-ring interface is upgraded *)
-    let input_string = String.make 2048 '\000' in
+    let input_ring = String.make 2048 '\000' in
 
-    let rec read_forever after =
-      let n = Console_ring.Ring.Back.unsafe_read t.ring input_string 0 (String.length input_string) in
+    let rec read_the_ring after =
+      let n = Console_ring.Ring.Back.unsafe_read t.ring input_ring 0 (String.length input_ring) in
       let open Lwt in
-      C.write_all c input_string 0 n >>= fun () ->
+      C.write_all c input_ring 0 n >>= fun () ->
       stats.total_read <- stats.total_read + n;
       Eventchn.notify t.xe t.evtchn;
       lwt next = A.after t.evtchn after in
-      read_forever next in
-    read_forever A.program_start
+      read_the_ring next in
 
+    let input_console = String.make 2048 '\000' in
+
+    let rec read_the_console () =
+      let open Lwt in
+      C.read c input_console 0 (String.length input_console) >>= fun n ->
+      let rec loop ofs remaining =
+        let written = Console_ring.Ring.Back.unsafe_write t.ring input_console ofs remaining in
+        let remaining = remaining - written in
+        let ofs = ofs + written in
+        stats.total_write <- stats.total_write + written;
+        Eventchn.notify t.xe t.evtchn;
+        if remaining = 0
+        then return ()
+        else loop ofs remaining in
+      loop 0 n >>= fun () ->
+      read_the_console () in
+
+    let (a: unit Lwt.t) = read_the_ring A.program_start in
+    let (b: unit Lwt.t) = read_the_console () in
+    Lwt.join [a; b]
+    
   let init xg xe domid ring_info c =
     let evtchn = Eventchn.bind_interdomain xe domid ring_info.RingInfo.event_channel in
     let grant = { Gnttab.domid = domid; ref = Int32.to_int ring_info.RingInfo.ref } in
