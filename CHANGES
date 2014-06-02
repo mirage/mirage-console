@@ -1,3 +1,6 @@
+trunk (unreleased)
+* enable travis (for both xen and unix cases)
+
 1.0.2 (01-02-2014):
 * [xen] Fix console on resume by reattaching the ring.
 * [xen] Switch to ocamlfind xen-{gnt,evtchn}.
