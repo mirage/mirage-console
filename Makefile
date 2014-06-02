@@ -3,7 +3,7 @@ all: build doc
 
 J=4
 
-ENABLE_XEN ?= $(shell if ocamlfind query xen-gnt >/dev/null 2>&1; then echo --enable-xen; else echo --disable-xen; fi)
+ENABLE_XEN ?= $(shell if ocamlfind query mirage-xen >/dev/null 2>&1; then echo --enable-xen; else echo --disable-xen; fi)
 
 export OCAMLRUNPARAM=b
 

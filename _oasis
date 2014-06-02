@@ -11,6 +11,13 @@ Flag xen
   Description:        true to build Xen library
   Default:            false
 
+Library mirage_console_protocol
+  CompiledObject:     best
+  Path:               lib
+  Findlibname:        mirage-console
+  Modules:            Conproto
+  BuildDepends:       lwt, xenstore
+
 Library mirage_console_xen
   Build$:             flag(xen)
   CompiledObject:     best
@@ -25,6 +32,13 @@ Library mirage_console_unix
   Findlibname:        mirage-console-unix
   Modules:            Console
   BuildDepends:       lwt, mirage-types
+
+Executable mirage_console
+  CompiledObject:     best
+  Install:            false
+  Path:               cli
+  MainIs:             main.ml
+  BuildDepends:       mirage-console, xenstore, xenstore.client, xenstore_transport, xenstore_transport.lwt, lwt, lwt.unix, cmdliner
 
 Executable portable
   CompiledObject:     best
