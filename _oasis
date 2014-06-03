@@ -1,0 +1,39 @@
+OASISFormat: 0.3
+Name:        mirage-console
+Version:     1.1.0
+Synopsis:    Console implementation for both Xen and Unix
+Authors:     Anil Madhavapeddy, David Scott
+License:     ISC
+Plugins:     META (0.3)
+BuildTools:  ocamlbuild
+
+Flag xen
+  Description:        true to build Xen library
+  Default:            false
+
+Library mirage_console_xen
+  Build$:             flag(xen)
+  CompiledObject:     best
+  Path:               xen
+  Findlibname:        mirage-console-xen
+  Modules:            Console
+  BuildDepends:       lwt, mirage-types, mirage-xen, io-page, xen-gnt, xen-evtchn
+
+Library mirage_console_unix
+  CompiledObject:     best
+  Path:               unix
+  Findlibname:        mirage-console-unix
+  Modules:            Console
+  BuildDepends:       lwt, mirage-types
+
+Executable portable
+  CompiledObject:     best
+  Install:            false
+  Path:               lib_test
+  MainIs:             portable.ml
+  BuildDepends:       mirage-console-unix
+
+Test portable_test
+  Run$:               flag(tests)
+  Command:            $portable
+  WorkingDirectory:   lib_test

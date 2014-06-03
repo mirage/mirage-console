@@ -1,2 +1,7 @@
 _build
 .*.swp
+setup.bin
+setup.data
+setup.log
+*.native
+config.mk

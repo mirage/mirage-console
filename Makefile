@@ -1,20 +1,37 @@
-all:
-	./opam_build false
+.PHONY: all clean install build
+all: build doc
 
-install:
-	./opam_build true
+J=4
 
-test:
-	./opam_build test
+ENABLE_XEN ?= $(shell if ocamlfind query xen-gnt >/dev/null 2>&1; then echo --enable-xen; else echo --disable-xen; fi)
 
-%-build:
-	OS=$* ./build
+export OCAMLRUNPARAM=b
 
-%-install:
-	OS=$* ./build true
+setup.bin: setup.ml
+	@ocamlopt.opt -o $@ $< || ocamlopt -o $@ $< || ocamlc -o $@ $<
+	@rm -f setup.cmx setup.cmi setup.o setup.cmo
 
-%-test:
-	OS=$* ./build test
+setup.data: setup.bin
+	./setup.bin -configure $(ENABLE_XEN) --enable-tests
+
+build: setup.data setup.bin
+	@./setup.bin -build -j $(J)
+
+doc: setup.data setup.bin
+	@./setup.bin -doc -j $(J)
+
+install: setup.bin
+	@./setup.bin -install
+
+uninstall:
+	@./setup.bin -uninstall
+
+test: setup.bin build
+	./setup.bin -test
+
+reinstall: setup.bin
+	@./setup.bin -reinstall
 
 clean:
-	rm -rf _build
+	@ocamlbuild -clean
+	@rm -f setup.data setup.log setup.bin

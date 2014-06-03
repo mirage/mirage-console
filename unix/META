@@ -1,8 +1,12 @@
-version = "1.0.0"
-description = "Logging console for UNIX"
-requires = "mirage-unix"
-archive(byte) = "mirage-console.cma"
-archive(byte, plugin) = "mirage-console.cma"
-archive(native) = "mirage-console.cmxa"
-archive(native, plugin) = "mirage-console.cmxs"
-exists_if = "mirage-console.cma"
+# OASIS_START
+# DO NOT EDIT (digest: 4c8f28689e4874b793f5a6424fc7dae8)
+version = "1.1.0"
+description = "Console implementation for both Xen and Unix"
+requires = "lwt mirage-types"
+archive(byte) = "mirage_console_unix.cma"
+archive(byte, plugin) = "mirage_console_unix.cma"
+archive(native) = "mirage_console_unix.cmxa"
+archive(native, plugin) = "mirage_console_unix.cmxs"
+exists_if = "mirage_console_unix.cma"
+# OASIS_STOP
+
