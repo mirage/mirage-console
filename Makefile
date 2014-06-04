@@ -3,6 +3,8 @@ all: build doc
 
 J=4
 
+ENABLE_MIRAGE_XEN ?= $(shell if ocamlfind query mirage-xen >/dev/null 2>&1; then echo --enable-miragexen; else echo --disable-miragexen; fi)
+
 ENABLE_XEN ?= $(shell if ocamlfind query xen-gnt >/dev/null 2>&1; then echo --enable-xen; else echo --disable-xen; fi)
 
 export OCAMLRUNPARAM=b
@@ -12,7 +14,7 @@ setup.bin: setup.ml
 	@rm -f setup.cmx setup.cmi setup.o setup.cmo
 
 setup.data: setup.bin
-	./setup.bin -configure $(ENABLE_XEN) --enable-tests
+	./setup.bin -configure $(ENABLE_MIRAGE_XEN) $(ENABLE_XEN) --enable-tests
 
 build: setup.data setup.bin
 	@./setup.bin -build -j $(J)

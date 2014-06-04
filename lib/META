@@ -1,0 +1,23 @@
+# OASIS_START
+# DO NOT EDIT (digest: a3d9ac6b809617d96404870b6565841c)
+version = "1.1.0"
+description = "Console implementation for both Xen and Unix"
+requires = "lwt xenstore"
+archive(byte) = "mirage_console.cma"
+archive(byte, plugin) = "mirage_console.cma"
+archive(native) = "mirage_console.cmxa"
+archive(native, plugin) = "mirage_console.cmxs"
+exists_if = "mirage_console.cma"
+package "backend" (
+ version = "1.1.0"
+ description = "Console implementation for both Xen and Unix"
+ requires =
+ "lwt xenstore mirage-console xen-gnt xen-evtchn mirage-types mirage-types.lwt shared-memory-ring shared-memory-ring.console"
+ archive(byte) = "mirage_console_backend.cma"
+ archive(byte, plugin) = "mirage_console_backend.cma"
+ archive(native) = "mirage_console_backend.cmxa"
+ archive(native, plugin) = "mirage_console_backend.cmxs"
+ exists_if = "mirage_console_backend.cma"
+)
+# OASIS_STOP
+
