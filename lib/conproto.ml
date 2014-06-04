@@ -93,15 +93,17 @@ module Connection = struct
     frontend_path: string;
     frontend_domid: int;
     protocol: Protocol.t;
+    name: string option; (* protocol extension to name consoles *)
   }
 
-  let make ?(protocol = Protocol.Vt100) ?(backend_domid = 0)
+  let make ?(protocol = Protocol.Vt100) ?(backend_domid = 0) ?name
     ~frontend_domid ~virtual_device () =
     let backend_path = Printf.sprintf "/local/domain/%d/backend/console/%d/%d"
       backend_domid frontend_domid virtual_device in
     let frontend_path = Printf.sprintf "/local/domain/%d/device/console/%d"
       frontend_domid virtual_device in
-    { virtual_device; backend_domid; backend_path; frontend_domid; frontend_path; protocol}
+    { virtual_device; backend_domid; backend_path;
+      frontend_domid; frontend_path; protocol; name }
 
   let to_assoc_list t =
     let backend = List.map (fun (owner, key, value) ->
@@ -115,7 +117,7 @@ module Connection = struct
       ] in
     let frontend = List.map (fun (owner, key, value) ->
       owner, Printf.sprintf "%s/%s" t.frontend_path key, value
-      ) [
+      ) ([
         `Frontend, "backend", t.backend_path;
         `Frontend, "backend-id", string_of_int t.backend_domid;
         `Frontend, "state", State.to_string State.Initialising;
@@ -124,7 +126,9 @@ module Connection = struct
         (* `Backend, "type", "xenconsoled"; *)
         `Backend, "output", "pty";
         `Backend, "tty", "";
-      ] in
+      ] @ (match t.name with
+           | None -> []
+           | Some n -> [ `Frontend, "name", n ])) in
     let all = [
         `Backend, t.backend_path, "";
         `Frontend, t.frontend_path, "";

@@ -22,7 +22,7 @@ open Xs_protocol
 module Client = Xs_client_lwt.Client(Xs_transport_lwt_unix_client)
 open Client
 
-let name =
+let backend_name =
   let sanitise x =
     let x' = String.length x in
     let y = String.create x' in
@@ -94,7 +94,7 @@ let find_free_console client vm =
     |> (fun x -> x + 1) in
   return free
 
-let main (vm: string) =
+let main (vm: string) (name: string option) =
   lwt client = make () in
   (* Figure out where the device is going to go: *)
   lwt vm = match_lwt find_vm client vm with
@@ -102,8 +102,10 @@ let main (vm: string) =
     | None -> fail (Failure (Printf.sprintf "Failed to find VM %s" vm)) in
   Printf.fprintf stderr "Operating on VM domain id: %d\n%!" vm;
   lwt devid = find_free_console client vm in
-  Printf.fprintf stderr "Creating device %d (by default linux device /dev/hvc%d unless udev renames it)\n%!"
-    devid (devid);
+  Printf.fprintf stderr "Creating device/console/%d\n" devid;
+  (match name with
+    | None -> Printf.fprintf stderr "Device has no 'name', default rules will apply and it will become /dev/hvcX\n%!"
+    | Some name -> Printf.fprintf stderr "Device has 'name = %s', look for a device in /dev/xenconsole/%s\n%!" name name);
   let device = vm, devid in
 
   let module M = Conback.Make(Unix_activations)(Client)(Console) in
@@ -115,7 +117,7 @@ let main (vm: string) =
     if not(!already_asked) then begin
       already_asked := true;
       Printf.fprintf stderr "Received signal, requesting hot-unplug.\n%!";
-      let (_: unit Lwt.t) = M.request_close name device in
+      let (_: unit Lwt.t) = M.request_close backend_name device in
       ()
     end else begin
       Printf.fprintf stderr "Received signal again, tearing down the backend.\n%!";
@@ -128,19 +130,19 @@ let main (vm: string) =
       ()
     ) [ Sys.sigint; Sys.sigterm ];
 
-  lwt () = M.create name device in
-  lwt stats = M.run "" name device in
+  lwt () = M.create ?name backend_name device in
+  lwt stats = M.run "" backend_name device in
   Printf.fprintf stderr "# console stats\n";
   Printf.fprintf stderr "Total read:     %d\n" stats.Conback.total_read;
   Printf.fprintf stderr "Total written:  %d\n" stats.Conback.total_write;
-  M.destroy name device
+  M.destroy backend_name device
 
-let connect (common: Common.t) (vm: string) =
+let connect (common: Common.t) (vm: string) (name: string option) =
   match vm with
     | "" ->
       `Error(true, "I don't know which VM to operate on. Please supply a VM name or uuid.")
     | vm ->
-      let () = Lwt_main.run (main vm) in
+      let () = Lwt_main.run (main vm name) in
       `Ok ()
 
 open Cmdliner
@@ -168,6 +170,10 @@ let common_options_t =
     Arg.(last & vflag_all [false] [verbose]) in
   Term.(pure Common.make $ debug $ verb)
 
+let console_name =
+  let doc = "Name for this console (visible to the VM)" in
+  Arg.(value & opt (some string) None & info [ "name" ]~doc)
+
 let connect_command =
   let doc = "Connect a console to a specific VM." in
   let man = [
@@ -177,7 +183,7 @@ let connect_command =
   let vm =
     let doc = "The domain, UUID or name of the VM to connect to." in
     Arg.(required & pos 0 (some string) None & info [ ] ~docv:"VM-name-or-uuid" ~doc) in
-  Term.(ret (pure connect $ common_options_t $ vm)),
+  Term.(ret (pure connect $ common_options_t $ vm $ console_name )),
   Term.info "connect" ~sdocs:_common_options ~doc ~man
 
 let default_cmd =

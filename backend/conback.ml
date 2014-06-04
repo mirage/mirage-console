@@ -104,9 +104,9 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: V1_LWT.CONSOLE with type id :
         return (int_of_string domid)
       with Xs_protocol.Enoent _ -> return 0)
 
-  let mk_backend_path client name (domid,devid) =
+  let mk_backend_path client backend_name (domid,devid) =
     lwt self = get_my_domid client in
-    return (Printf.sprintf "/local/domain/%d/backend/%s/%d/%d" self name domid devid)
+    return (Printf.sprintf "/local/domain/%d/backend/%s/%d/%d" self backend_name domid devid)
 
   let mk_frontend_path client (domid,devid) =
     return (Printf.sprintf "/local/domain/%d/device/console/%d" domid devid)
@@ -137,9 +137,9 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: V1_LWT.CONSOLE with type id :
   let exists client k = match_lwt read_one client k with `Error _ -> return false | _ -> return true
 
   (* Request a hot-unplug *)
-  let request_close name (domid, devid) =
+  let request_close backend_name (domid, devid) =
     lwt client = make () in
-    lwt backend_path = mk_backend_path client name (domid,devid) in
+    lwt backend_path = mk_backend_path client backend_name (domid,devid) in
     writev client (List.map (fun (k, v) -> backend_path ^ "/" ^ k, v) (Conproto.State.to_assoc_list Conproto.State.Closing))
 
   let force_close (domid, device) =
@@ -147,7 +147,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: V1_LWT.CONSOLE with type id :
     lwt frontend_path = mk_frontend_path client (domid, device) in
     write_one client (frontend_path ^ "/state") (Conproto.State.to_string Conproto.State.Closed)
 
-  let run (id: string) name (domid,devid) =
+  let run (id: string) backend_name (domid,devid) =
     lwt client = make () in
     let xg = Gnttab.interface_open () in
     let xe = Eventchn.init () in
@@ -155,7 +155,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: V1_LWT.CONSOLE with type id :
     let open ConsoleError in
     C.connect id >>= fun t ->
     let ( >>= ) = Lwt.bind in
-    lwt backend_path = mk_backend_path client name (domid,devid) in
+    lwt backend_path = mk_backend_path client backend_name (domid,devid) in
 
     try_lwt
 
@@ -199,10 +199,10 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: V1_LWT.CONSOLE with type id :
       lwt () = C.disconnect t in
       fail e
 
-  let create ?backend_domid name (domid, device) =
+  let create ?backend_domid ?name backend_name (domid, device) =
     lwt client = make () in
     (* Construct the device: *)
-    lwt backend_path = mk_backend_path client name (domid, device) in
+    lwt backend_path = mk_backend_path client backend_name (domid, device) in
     lwt frontend_path = mk_frontend_path client (domid, device) in
     lwt backend_domid = match backend_domid with
     | None -> get_my_domid client
@@ -214,6 +214,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: V1_LWT.CONSOLE with type id :
       frontend_path;
       frontend_domid = domid;
       protocol = Conproto.Protocol.Vt100;
+      name = name;
     }) in
     transaction client (fun xs ->
       Lwt_list.iter_s (fun (acl, (k, v)) ->
@@ -223,9 +224,9 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: V1_LWT.CONSOLE with type id :
       ) (Conproto.Connection.to_assoc_list c)
     )
 
-  let destroy name (domid, device) =
+  let destroy backend_name (domid, device) =
     lwt client = make () in
-    lwt backend_path = mk_backend_path client name (domid, device) in
+    lwt backend_path = mk_backend_path client backend_name (domid, device) in
     lwt frontend_path = mk_frontend_path client (domid, device) in
     immediate client (fun xs ->
       lwt () = try_lwt rm xs backend_path with _ -> return () in
