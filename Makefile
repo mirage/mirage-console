@@ -19,11 +19,23 @@ setup.data: setup.bin
 build: setup.data setup.bin
 	@./setup.bin -build -j $(J)
 
+# Legacy build target:
+xen-build: setup.bin
+	./setup.bin -configure $(ENABLE_MIRAGE_XEN) $(ENABLE_XEN) --disable-unix
+	./setup.bin -build -j $(J)
+
+unix-build: setup.bin
+	./setup.bin -configure --disable-miragexen --disable-xen --enable-unix
+	./setup.bin -build -j $(J)
+
 doc: setup.data setup.bin
 	@./setup.bin -doc -j $(J)
 
 install: setup.bin
 	@./setup.bin -install
+
+xen-install: install
+unix-install: install
 
 uninstall:
 	@./setup.bin -uninstall

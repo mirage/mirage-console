@@ -7,6 +7,10 @@ License:     ISC
 Plugins:     META (0.3)
 BuildTools:  ocamlbuild
 
+Flag unix
+  Description:        true to build Unix library
+  Default:            true
+
 Flag xen
   Description:        true to build Xen library
   Default:            false
@@ -16,6 +20,7 @@ Flag miragexen
   Default:            false
 
 Library mirage_console
+  Build$:             flag(xen)
   CompiledObject:     best
   Path:               lib
   Findlibname:        mirage-console
@@ -40,6 +45,7 @@ Library mirage_console_xen
   BuildDepends:       lwt, mirage-types, mirage-xen, io-page, xen-gnt, xen-evtchn
 
 Library mirage_console_unix
+  Build$:             flag(unix)
   CompiledObject:     best
   Path:               unix
   Findlibname:        mirage-console-unix
@@ -47,7 +53,7 @@ Library mirage_console_unix
   BuildDepends:       lwt, mirage-types
 
 Executable mirage_console_cli
-  Build$:             flag(xen)
+  Build$:             flag(xen) && flag(unix)
   CompiledObject:     best
   Install:            false
   Path:               cli
@@ -55,6 +61,7 @@ Executable mirage_console_cli
   BuildDepends:       mirage-console, mirage-console-unix, io-page.unix, io-page, xen-evtchn, xen-evtchn.unix, xen-evtchn.unix.activations, xen-gnt.unix, xen-gnt, mirage-console.backend, xenstore, xenstore.client, xenstore_transport, xenstore_transport.lwt, lwt, lwt.unix, cmdliner
 
 Executable portable
+  Build$:             flag(unix)
   CompiledObject:     best
   Install:            false
   Path:               lib_test
