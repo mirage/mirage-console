@@ -6,6 +6,7 @@ trunk (unreleased)
 * add command-line tool to attach consoles
 * add experimental support for named consoles
 * add support for reading from consoles (so we can do user interaction)
+* [xen] support connecting to additional (named) consoles
 
 1.0.2 (01-02-2014):
 * [xen] Fix console on resume by reattaching the ring.
