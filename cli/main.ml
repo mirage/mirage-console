@@ -94,7 +94,7 @@ let find_free_console client vm =
     |> (fun x -> x + 1) in
   return free
 
-let main (vm: string) (name: string option) =
+let connect' (vm: string) (name: string option) =
   lwt client = make () in
   (* Figure out where the device is going to go: *)
   lwt vm = match_lwt find_vm client vm with
@@ -137,12 +137,42 @@ let main (vm: string) (name: string option) =
   Printf.fprintf stderr "Total written:  %d\n" stats.Conback.total_write;
   M.destroy backend_name device
 
+let plug' ?(backend="0") (vm: string) (name: string option) =
+  lwt client = make () in
+  (* Figure out where the device is going to go: *)
+  lwt vm = match_lwt find_vm client vm with
+    | Some vm -> return vm
+    | None -> fail (Failure (Printf.sprintf "Failed to find VM %s" vm)) in
+  lwt backend = match_lwt find_vm client backend with
+    | Some vm -> return vm
+    | None -> fail (Failure (Printf.sprintf "Failed to find VM %s" backend)) in
+  Printf.fprintf stderr "Backend VM domain id: %d\n" backend;
+  Printf.fprintf stderr "Frontend VM domain id: %d\n%!" vm;
+  lwt devid = find_free_console client vm in
+  Printf.fprintf stderr "Creating device/console/%d\n" devid;
+  (match name with
+    | None -> Printf.fprintf stderr "Device has no 'name', default rules will apply and it will become /dev/hvcX\n%!"
+    | Some name -> Printf.fprintf stderr "Device has 'name = %s', look for a device in /dev/xenconsole/%s\n%!" name name);
+  let device = vm, devid in
+  let module M = Conback.Make(Unix_activations)(Client)(Console) in
+  lwt () = M.create ?name ~backend_domid:backend "console" device in
+  Printf.fprintf stderr "Device connection initiated\n%!";
+  return ()
+
 let connect (common: Common.t) (vm: string) (name: string option) =
   match vm with
     | "" ->
       `Error(true, "I don't know which VM to operate on. Please supply a VM name or uuid.")
     | vm ->
-      let () = Lwt_main.run (main vm name) in
+      let () = Lwt_main.run (connect' vm name) in
+      `Ok ()
+
+let plug (common: Common.t) (backend: string option) (vm: string) (name: string option) =
+  match vm with
+    | "" ->
+      `Error(true, "I don't know which VM to operate on. Please supply a VM name or uuid.")
+    | vm ->
+      let () = Lwt_main.run (plug' ?backend vm name) in
       `Ok ()
 
 open Cmdliner
@@ -179,6 +209,7 @@ let connect_command =
   let man = [
     `S "DESCRIPTION";
     `P "Connect a console to a specific VM.";
+    `P "This command creates a virtual console in the specified VM and implements it locally. Reads and writes to the local terminal will be proxied to the remote console and vice-versa.";
   ] in
   let vm =
     let doc = "The domain, UUID or name of the VM to connect to." in
@@ -186,13 +217,28 @@ let connect_command =
   Term.(ret (pure connect $ common_options_t $ vm $ console_name )),
   Term.info "connect" ~sdocs:_common_options ~doc ~man
 
+let plug_command =
+  let doc = "Plug a console frontend into a backend." in
+  let man = [
+    `S "DESCRIPTION";
+    `P "";
+  ] in
+  let backend =
+    let doc = "The domain, UUID or name of the backend VM." in
+    Arg.(value & opt (some string) None & info [ "backend" ] ~doc) in
+  let vm =
+    let doc = "The domain, UUID or name of the VM to connect to." in
+    Arg.(required & pos 0 (some string) None & info [ ] ~docv:"VM-name-or-uuid" ~doc) in
+  Term.(ret (pure plug $ common_options_t $ backend $ vm $ console_name )),
+  Term.info "plug" ~sdocs:_common_options ~doc ~man
+
 let default_cmd =
   let doc = "manipulate virtual console devices on Xen virtual machines" in
   let man = help in
   Term.(ret (pure (fun _ -> `Help (`Pager, None)) $ common_options_t)),
   Term.info "mirage-console" ~version:"0.1" ~sdocs:_common_options ~doc ~man
 
-let cmds = [ connect_command ]
+let cmds = [ connect_command; plug_command ]
 
 let _ =
   match Term.eval_choice default_cmd cmds with

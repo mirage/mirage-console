@@ -28,6 +28,11 @@ let connect id = return (`Ok {id} )
 let disconnect _t = return ()
 let id {id} = id
 
+let read t buf off len =
+  if len > String.length buf - off
+  then fail (Invalid_argument "len")
+  else Lwt_io.read_into Lwt_io.stdin buf off len
+
 let write t buf off len = prerr_string (String.sub buf off len); flush stderr; len
 
 let rec write_all t buf off len =
@@ -36,7 +41,7 @@ let rec write_all t buf off len =
     write_all t buf (off+w) (len-w)
   else return ()
 
-let log t s = prerr_endline s 
+let log t s = prerr_endline s
 
 let log_s t s =
   let s = s ^ "\n" in
