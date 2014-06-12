@@ -77,11 +77,10 @@ let plug id =
 
   let evtchn = Eventchn.bind_unbound_port h backend_id in
   let port = Eventchn.to_int evtchn in
+  let ring_info = Conproto.RingInfo.({event_channel = port; ref = Int32.of_int gnt }) in
   let info = [
-    "ring-ref", string_of_int gnt;
-    "event-channel", string_of_int port;
     "state", Device_state.(to_string Connected)
-  ] in
+  ] @ (Conproto.RingInfo.to_assoc_list ring_info) in
   Xs.(transaction xs (fun h ->
       Lwt_list.iter_s (fun (k, v) -> write h (node k) v) info
     )) >>= fun () ->
