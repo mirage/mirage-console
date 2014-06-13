@@ -130,7 +130,8 @@ let get_initial_console () =
 
   let page = Start_info.console_start_page () in
   let ring = Io_page.to_cstruct page in
-  Console_ring.Ring.init ring; (* explicitly zero the ring *)
+  (* We don't need to zero the initial console ring, and doing so may lose boot
+   * messages from Mini-OS. *)
 
   let get_evtchn () =
     let e = Eventchn.of_int Start_info.((get ()).console_evtchn) in
