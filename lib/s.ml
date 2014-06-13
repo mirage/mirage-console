@@ -19,8 +19,4 @@
      with type 'a io = 'a Lwt.t
      with type id = string
 
-     val read : t -> string -> int -> int -> int Lwt.t
-     (** [read t buf off len] reads up to [len] chars of [String.sub buf
-         off len] from the console [t] and returns the number of bytes
-         read. Raises {!Invalid_argument} if [len > buf - off]. *)
 end
