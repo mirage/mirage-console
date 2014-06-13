@@ -200,13 +200,19 @@ let write cons buf off len =
   Eventchn.notify h cons.evtchn;
   nb_written
 
-let read cons buf off len =
-  if len > String.length buf - off then fail (Invalid_argument "len")
-  else begin
-    let nb_read = Console_ring.Ring.Front.unsafe_read cons.ring buf off len in
+let rec read_ev event cons buf off len =
+  let nb_read = Console_ring.Ring.Front.unsafe_read cons.ring buf off len in
+  if nb_read = 0 then begin
+    Activations.after cons.evtchn event >>= fun event ->
+    read_ev event cons buf off len
+  end else begin
     Eventchn.notify h cons.evtchn;
     return nb_read
   end
+
+let read cons buf off len =
+  if len > String.length buf - off then fail (Invalid_argument "len")
+  else read_ev Activations.program_start cons buf off len
 
 let log t s =
   let s = s ^ "\r\n" in
