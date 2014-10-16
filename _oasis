@@ -1,6 +1,6 @@
 OASISFormat: 0.3
 Name:        mirage-console
-Version:     1.1.0
+Version:     2.0.0
 Synopsis:    Console implementation for both Xen and Unix
 Authors:     Anil Madhavapeddy, David Scott
 License:     ISC
@@ -39,7 +39,8 @@ Library mirage_console_xen
   Build$:             flag(miragexen)
   CompiledObject:     best
   Path:               xen
-  Findlibname:        mirage-console-xen
+  Findlibparent:      mirage_console
+  Findlibname:        xen
   Modules:            Console
   BuildDepends:       lwt, mirage-types, mirage-xen, io-page, xen-gnt, xen-evtchn, mirage-console
 
@@ -47,7 +48,8 @@ Library mirage_console_unix
   Build$:             flag(unix)
   CompiledObject:     best
   Path:               unix
-  Findlibname:        mirage-console-unix
+  Findlibparent:      mirage_console
+  Findlibname:        unix
   Modules:            Console
   BuildDepends:       lwt, lwt.unix, mirage-types, mirage-console, cstruct.lwt
 

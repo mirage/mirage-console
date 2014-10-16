@@ -1,4 +1,4 @@
-trunk (unreleased)
+2.0.0 (unreleased)
 * enable travis (for both xen and unix cases)
 * fix dependencies: drop mirage-{xen,unix}; keep dependencies on implementation
   libraries and mirage-types
@@ -8,6 +8,7 @@ trunk (unreleased)
 * add support for reading from consoles (so we can do user interaction)
 * [xen] support connecting to additional (named) consoles
 * [xen] don't zero the initial console ring
+* install findlib packages as `mirage-console.[xen/unix]`
 
 1.0.2 (01-02-2014):
 * [xen] Fix console on resume by reattaching the ring.
