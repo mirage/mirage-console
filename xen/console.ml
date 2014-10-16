@@ -188,7 +188,7 @@ let write_one t buf =
     if Cstruct.len buffer = 0
     then return ()
     else begin
-      let seq, avail = Console_ring.Ring.Front.write_prepare t.ring in
+      let seq, avail = Console_ring.Ring.Front.Writer.write t.ring in
       if Cstruct.len avail = 0 then begin
         Activations.after t.evtchn after >>= fun next ->
         loop next buffer
@@ -196,7 +196,7 @@ let write_one t buf =
         let n = min (Cstruct.len avail) (Cstruct.len buffer) in
         Cstruct.blit buffer 0 avail 0 n;
         let seq = Int32.(add seq (of_int n)) in
-        Console_ring.Ring.Front.write_commit t.ring seq;
+        Console_ring.Ring.Front.Writer.advance t.ring seq;
         Eventchn.notify h t.evtchn;
         loop after (Cstruct.shift buffer n)
       end
@@ -221,14 +221,14 @@ let writev t bufs =
 
 let read t =
   let rec wait_for_data after =
-    let seq, avail = Console_ring.Ring.Front.read_prepare t.ring in
+    let seq, avail = Console_ring.Ring.Front.Reader.read t.ring in
     if Cstruct.len avail = 0 && not t.closed then begin
       Activations.after t.evtchn after >>= fun after ->
       wait_for_data after
     end else begin
       let copy = Cstruct.create (Cstruct.len avail) in
       Cstruct.blit avail 0 copy 0 (Cstruct.len avail);
-      Console_ring.Ring.Front.read_commit t.ring Int32.(add seq (of_int (Cstruct.len avail)));
+      Console_ring.Ring.Front.Reader.advance t.ring Int32.(add seq (of_int (Cstruct.len avail)));
       Eventchn.notify h t.evtchn;
       return copy
     end in
@@ -236,15 +236,15 @@ let read t =
   return (if Cstruct.len buf = 0 then `Eof else `Ok buf)
 
 let close t =
-  t.closing <- true;
+  t.closed <- true;
   return ()
 
 let log t s =
   let s = s ^ "\r\n" in
-  let seq, avail = Console_ring.Ring.Front.write_prepare t.ring in
+  let seq, avail = Console_ring.Ring.Front.Writer.write t.ring in
   let n = min (String.length s) (Cstruct.len avail) in
   Cstruct.blit_from_string s 0 avail 0 n;
-  Console_ring.Ring.Front.write_commit t.ring Int32.(add seq (of_int n));
+  Console_ring.Ring.Front.Writer.advance t.ring Int32.(add seq (of_int n));
   Eventchn.notify h t.evtchn
 
 let log_s t s =
