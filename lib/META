@@ -1,8 +1,8 @@
 # OASIS_START
-# DO NOT EDIT (digest: 756d8e4854202bab64d8b67c0f22417b)
+# DO NOT EDIT (digest: 837fe7cc069debe7cfd1e8673f26303b)
 version = "2.0.0"
 description = "Console implementation for both Xen and Unix"
-requires = "lwt xenstore mirage-types mirage-types.lwt"
+requires = "lwt mirage-types mirage-types.lwt"
 archive(byte) = "mirage_console.cma"
 archive(byte, plugin) = "mirage_console.cma"
 archive(native) = "mirage_console.cmxa"
@@ -12,7 +12,7 @@ package "xen" (
  version = "2.0.0"
  description = "Console implementation for both Xen and Unix"
  requires =
- "lwt mirage-types mirage-xen io-page xen-gnt xen-evtchn mirage-console"
+ "lwt mirage-types mirage-xen io-page xen-gnt xen-evtchn mirage-console.proto"
  archive(byte) = "mirage_console_xen.cma"
  archive(byte, plugin) = "mirage_console_xen.cma"
  archive(native) = "mirage_console_xen.cmxa"
@@ -31,11 +31,22 @@ package "unix" (
  exists_if = "mirage_console_unix.cma"
 )
 
+package "proto" (
+ version = "2.0.0"
+ description = "Console implementation for both Xen and Unix"
+ requires = "xenstore mirage-console"
+ archive(byte) = "mirage_console_proto.cma"
+ archive(byte, plugin) = "mirage_console_proto.cma"
+ archive(native) = "mirage_console_proto.cmxa"
+ archive(native, plugin) = "mirage_console_proto.cmxs"
+ exists_if = "mirage_console_proto.cma"
+)
+
 package "backend" (
  version = "2.0.0"
  description = "Console implementation for both Xen and Unix"
  requires =
- "lwt xenstore mirage-console xen-gnt xen-evtchn mirage-types mirage-types.lwt shared-memory-ring shared-memory-ring.console"
+ "lwt xenstore mirage-console.proto xen-gnt xen-evtchn mirage-types mirage-types.lwt shared-memory-ring shared-memory-ring.console"
  archive(byte) = "mirage_console_backend.cma"
  archive(byte, plugin) = "mirage_console_backend.cma"
  archive(native) = "mirage_console_backend.cmxa"

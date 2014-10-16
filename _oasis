@@ -23,8 +23,17 @@ Library mirage_console
   CompiledObject:     best
   Path:               lib
   Findlibname:        mirage-console
-  Modules:            Conproto, S
-  BuildDepends:       lwt, xenstore, mirage-types, mirage-types.lwt
+  Modules:            S
+  BuildDepends:       lwt, mirage-types, mirage-types.lwt
+
+Library mirage_console_proto
+  CompiledObject:     best
+  Build$:             flag(xen)
+  Path:               lib
+  Findlibparent:      mirage_console
+  Findlibname:        proto
+  Modules:            Conproto
+  BuildDepends:       xenstore, mirage-console
 
 Library mirage_console_backend
   Build$:             flag(xen)
@@ -33,7 +42,7 @@ Library mirage_console_backend
   Findlibparent:      mirage_console
   Findlibname:        backend
   Modules:            Conback
-  BuildDepends:       lwt, xenstore, mirage-console, xen-gnt, xen-evtchn, mirage-types, mirage-types.lwt, shared-memory-ring, shared-memory-ring.console
+  BuildDepends:       lwt, xenstore, mirage-console.proto, xen-gnt, xen-evtchn, mirage-types, mirage-types.lwt, shared-memory-ring, shared-memory-ring.console
 
 Library mirage_console_xen
   Build$:             flag(miragexen)
@@ -42,7 +51,7 @@ Library mirage_console_xen
   Findlibparent:      mirage_console
   Findlibname:        xen
   Modules:            Console
-  BuildDepends:       lwt, mirage-types, mirage-xen, io-page, xen-gnt, xen-evtchn, mirage-console
+  BuildDepends:       lwt, mirage-types, mirage-xen, io-page, xen-gnt, xen-evtchn, mirage-console.proto
 
 Library mirage_console_unix
   Build$:             flag(unix)
@@ -59,7 +68,7 @@ Executable mirage_console_cli
   Install:            false
   Path:               cli
   MainIs:             main.ml
-  BuildDepends:       mirage-console, mirage-console-unix, io-page.unix, io-page, xen-evtchn, xen-evtchn.unix, xen-evtchn.unix.activations, xen-gnt.unix, xen-gnt, mirage-console.backend, xenstore, xenstore.client, xenstore_transport, xenstore_transport.lwt, lwt, lwt.unix, cmdliner
+  BuildDepends:       mirage-console, mirage-console.unix, io-page.unix, io-page, xen-evtchn, xen-evtchn.unix, xen-evtchn.unix.activations, xen-gnt.unix, xen-gnt, mirage-console.backend, xenstore, xenstore.client, xenstore_transport, xenstore_transport.lwt, lwt, lwt.unix, cmdliner
 
 Executable portable
   Build$:             flag(unix)
