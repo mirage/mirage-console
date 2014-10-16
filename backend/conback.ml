@@ -66,39 +66,52 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: S.CONSOLE) = struct
 
   let service_thread t c stats =
 
-    (* XXX: remove copies when shared-memory-ring interface is upgraded *)
-    let input_ring = String.make 2048 '\000' in
+    let (>>|=) m f =
+      let open Lwt in
+      m >>= function
+      | `Ok x -> f x
+      | `Eof -> fail (Failure "End of file")
+      | `Error (`Invalid_console x) -> fail (Failure (Printf.sprintf "Invalid_console %s" x)) in
 
     let rec read_the_ring after =
-      let n = Console_ring.Ring.Back.unsafe_read t.ring input_ring 0 (String.length input_ring) in
       let open Lwt in
-      C.write_all c input_ring 0 n >>= fun () ->
+      let seq, avail = Console_ring.Ring.Front.read_prepare t.ring in
+      C.write c avail >>|= fun () ->
+      let n = Cstruct.len avail in
       stats.total_read <- stats.total_read + n;
+      let seq = Int32.(add seq (of_int n)) in
+      Console_ring.Ring.Front.read_commit t.ring seq;
       Eventchn.notify t.xe t.evtchn;
-      lwt next = A.after t.evtchn after in
+      A.after t.evtchn after >>= fun next ->
       read_the_ring next in
 
-    let input_console = String.make 2048 '\000' in
-
-    let rec read_the_console () =
+    let rec read_the_console after =
       let open Lwt in
-      C.read c input_console 0 (String.length input_console) >>= fun n ->
-      let rec loop ofs remaining =
-        let written = Console_ring.Ring.Back.unsafe_write t.ring input_console ofs remaining in
-        let remaining = remaining - written in
-        let ofs = ofs + written in
-        stats.total_write <- stats.total_write + written;
-        Eventchn.notify t.xe t.evtchn;
-        if remaining = 0
-        then return ()
-        else loop ofs remaining in
-      loop 0 n >>= fun () ->
-      read_the_console () in
+      C.read c >>|= fun buffer ->
+      let rec loop after buffer =
+        if Cstruct.len buffer = 0
+        then return after
+        else begin
+          let seq, avail = Console_ring.Ring.Back.write_prepare t.ring in
+          if Cstruct.len avail = 0 then begin
+            A.after t.evtchn after >>= fun next ->
+            loop next buffer
+          end else begin
+            let n = min (Cstruct.len avail) (Cstruct.len buffer) in
+            Cstruct.blit buffer 0 avail 0 n;
+            let seq = Int32.(add seq (of_int n)) in
+            Console_ring.Ring.Back.write_commit t.ring seq;
+            Eventchn.notify t.xe t.evtchn;
+            loop after (Cstruct.shift buffer n)
+          end
+        end in
+      loop after buffer >>= fun after ->
+      read_the_console after in
 
     let (a: unit Lwt.t) = read_the_ring A.program_start in
-    let (b: unit Lwt.t) = read_the_console () in
+    let (b: unit Lwt.t) = read_the_console A.program_start in
     Lwt.join [a; b]
-    
+
   let init xg xe domid ring_info c =
     let evtchn = Eventchn.bind_interdomain xe domid ring_info.RingInfo.event_channel in
     let grant = { Gnttab.domid = domid; ref = Int32.to_int ring_info.RingInfo.ref } in

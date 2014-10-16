@@ -25,6 +25,7 @@ type t = {
   gnt: Gnt.gntref;
   ring: Cstruct.t;
   mutable evtchn: Eventchn.t;
+  mutable closed: bool;
 }
 
 type 'a io = 'a Lwt.t
@@ -91,7 +92,8 @@ let plug id =
   printf "Console %d: connected\n" id;
 
   Eventchn.unmask h evtchn;
-  let t = { id; backend_id; gnt; ring; evtchn  } in
+  let closed = false in
+  let t = { id; backend_id; gnt; ring; evtchn; closed  } in
 
   return t
 
@@ -138,7 +140,8 @@ let get_initial_console () =
     Eventchn.unmask h e;
     e in
   let evtchn = get_evtchn () in
-  let cons = { id = 0; backend_id; gnt; ring; evtchn  } in
+  let closed = false in
+  let cons = { id = 0; backend_id; gnt; ring; evtchn; closed  } in
   Sched.add_resume_hook (fun () -> cons.evtchn <- get_evtchn (); Lwt.return ());
 
   Eventchn.unmask h evtchn;
@@ -178,47 +181,74 @@ let connect id =
 let disconnect _id =
   return ()
 
-let rec write_all_low event cons buf off len =
-  if len > String.length buf - off
-  then Lwt.fail (Invalid_argument "len")
+type buffer = Cstruct.t
+
+let write_one t buf =
+  let rec loop after buffer =
+    if Cstruct.len buffer = 0
+    then return ()
+    else begin
+      let seq, avail = Console_ring.Ring.Front.write_prepare t.ring in
+      if Cstruct.len avail = 0 then begin
+        Activations.after t.evtchn after >>= fun next ->
+        loop next buffer
+      end else begin
+        let n = min (Cstruct.len avail) (Cstruct.len buffer) in
+        Cstruct.blit buffer 0 avail 0 n;
+        let seq = Int32.(add seq (of_int n)) in
+        Console_ring.Ring.Front.write_commit t.ring seq;
+        Eventchn.notify h t.evtchn;
+        loop after (Cstruct.shift buffer n)
+      end
+    end in
+  loop Activations.program_start buf
+
+let write t buf =
+  if t.closed
+  then return `Eof
   else
-    let w = Console_ring.Ring.Front.unsafe_write cons.ring buf off len in
-    Eventchn.notify h cons.evtchn;
-    let left = len - w in
-    assert (left >= 0);
-    if left = 0 then return ()
-    else
-      Activations.after cons.evtchn event
-      >>= fun event ->
-      write_all_low event cons buf (off+w) left
+    write_one t buf
+    >>= fun () ->
+    return (`Ok ())
 
-let write_all cons buf off len =
-  write_all_low Activations.program_start cons buf off len
+let writev t bufs =
+  if t.closed
+  then return `Eof
+  else
+    Lwt_list.iter_s (write_one t) bufs
+    >>= fun () ->
+    return (`Ok ())
 
-let write cons buf off len =
-  if len > String.length buf - off then raise (Invalid_argument "len");
-  let nb_written = Console_ring.Ring.Front.unsafe_write cons.ring buf off len in
-  Eventchn.notify h cons.evtchn;
-  nb_written
+let read t =
+  let rec wait_for_data after =
+    let seq, avail = Console_ring.Ring.Front.read_prepare t.ring in
+    if Cstruct.len avail = 0 && not t.closed then begin
+      Activations.after t.evtchn after >>= fun after ->
+      wait_for_data after
+    end else begin
+      let copy = Cstruct.create (Cstruct.len avail) in
+      Cstruct.blit avail 0 copy 0 (Cstruct.len avail);
+      Console_ring.Ring.Front.read_commit t.ring Int32.(add seq (of_int (Cstruct.len avail)));
+      Eventchn.notify h t.evtchn;
+      return copy
+    end in
+  wait_for_data Activations.program_start >>= fun buf ->
+  return (if Cstruct.len buf = 0 then `Eof else `Ok buf)
 
-let rec read_ev event cons buf off len =
-  let nb_read = Console_ring.Ring.Front.unsafe_read cons.ring buf off len in
-  if nb_read = 0 then begin
-    Activations.after cons.evtchn event >>= fun event ->
-    read_ev event cons buf off len
-  end else begin
-    Eventchn.notify h cons.evtchn;
-    return nb_read
-  end
-
-let read cons buf off len =
-  if len > String.length buf - off then fail (Invalid_argument "len")
-  else read_ev Activations.program_start cons buf off len
+let close t =
+  t.closing <- true;
+  return ()
 
 let log t s =
   let s = s ^ "\r\n" in
-  let (_:int) = write t s 0 (String.length s) in ()
+  let seq, avail = Console_ring.Ring.Front.write_prepare t.ring in
+  let n = min (String.length s) (Cstruct.len avail) in
+  Cstruct.blit_from_string s 0 avail 0 n;
+  Console_ring.Ring.Front.write_commit t.ring Int32.(add seq (of_int n));
+  Eventchn.notify h t.evtchn
 
 let log_s t s =
   let s = s ^ "\r\n" in
-  write_all_low Activations.program_start t s 0 (String.length s)
+  let buf = Cstruct.create (String.length s) in
+  Cstruct.blit_from_string s 0 buf 0 (String.length s);
+  write_one t buf
