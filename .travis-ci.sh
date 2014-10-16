@@ -27,8 +27,8 @@ opam remote add mirage git://github.com/mirage/mirage-dev
 opam pin $pinx mirage-console .
 opam install mirage-console -v
 opam remove mirage-console
-opam install xen-gnt mirage-console -v
+opam install xen-gnt xenstore mirage-types mirage-console -v
 opam remove mirage-console
-opam install mirage-xen mirage-console -v
+opam install xen-gnt mirage-console -v
 opam remove mirage-xen mirage-console
 opam install mirage-console -v

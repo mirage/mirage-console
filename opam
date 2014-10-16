@@ -12,10 +12,13 @@ build: [
 remove: ["ocamlfind" "remove" "mirage-console-xen"]
 depends: [
   "ocamlfind"
+  "lwt"
+  "cstruct"
+  "io-page"
 ]
 depopts: [
-  ("mirage-types" & "mirage-xen")
-  "xen-gnt"
+  ("mirage-types" & "mirage-xen" & "xenstore")
+  ("xen-gnt" & "xenstore"
 ]
 conflicts: [
   "mirage-xen" { <"1.1.0" }
