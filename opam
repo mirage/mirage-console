@@ -1,0 +1,23 @@
+opam-version: "1"
+maintainer: "anil@recoil.org"
+tags: [
+  "org:mirage"
+  "org:xapi-project"
+]
+build: [
+  ["ocaml" "setup.ml" "-configure" "--prefix" prefix "--%{xen-gnt:enable}%-xen" "--%{mirage-xen:enable}%-miragexen"]
+  ["ocaml" "setup.ml" "-build"]
+  ["ocaml" "setup.ml" "-install"]
+]
+remove: ["ocamlfind" "remove" "mirage-console-xen"]
+depends: [
+  "ocamlfind"
+]
+depopts: [
+  ("mirage-types" & "mirage-xen")
+  "xen-gnt"
+]
+conflicts: [
+  "mirage-xen" { <"1.1.0" }
+  "mirage-types" { <"1.1.0" }
+]
