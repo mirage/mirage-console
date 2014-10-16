@@ -75,12 +75,12 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: S.CONSOLE) = struct
 
     let rec read_the_ring after =
       let open Lwt in
-      let seq, avail = Console_ring.Ring.Front.read_prepare t.ring in
+      let seq, avail = Console_ring.Ring.Front.Reader.read t.ring in
       C.write c avail >>|= fun () ->
       let n = Cstruct.len avail in
       stats.total_read <- stats.total_read + n;
       let seq = Int32.(add seq (of_int n)) in
-      Console_ring.Ring.Front.read_commit t.ring seq;
+      Console_ring.Ring.Front.Reader.advance t.ring seq;
       Eventchn.notify t.xe t.evtchn;
       A.after t.evtchn after >>= fun next ->
       read_the_ring next in
@@ -92,7 +92,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: S.CONSOLE) = struct
         if Cstruct.len buffer = 0
         then return after
         else begin
-          let seq, avail = Console_ring.Ring.Back.write_prepare t.ring in
+          let seq, avail = Console_ring.Ring.Back.Writer.write t.ring in
           if Cstruct.len avail = 0 then begin
             A.after t.evtchn after >>= fun next ->
             loop next buffer
@@ -100,7 +100,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: S.CONSOLE) = struct
             let n = min (Cstruct.len avail) (Cstruct.len buffer) in
             Cstruct.blit buffer 0 avail 0 n;
             let seq = Int32.(add seq (of_int n)) in
-            Console_ring.Ring.Back.write_commit t.ring seq;
+            Console_ring.Ring.Back.Writer.advance t.ring seq;
             Eventchn.notify t.xe t.evtchn;
             loop after (Cstruct.shift buffer n)
           end
