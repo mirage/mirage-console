@@ -29,6 +29,7 @@ opam --version
 opam --git-version
 
 opam init
+opam remote add mirage git://github.com/mirage/mirage-dev
 depext=`opam install -e ubuntu $OPAM_DEPENDS`
 sudo apt-get install -qq $depext
 opam install ${OPAM_DEPENDS}
