@@ -6,11 +6,10 @@ tags: [
   "org:xapi-project"
 ]
 build: [
-  ["ocaml" "setup.ml" "-configure" "--prefix" prefix "--%{xen-gnt:enable}%-xen" "--%{mirage-xen:enable}%-miragexen"]
-  ["ocaml" "setup.ml" "-build"]
-  ["ocaml" "setup.ml" "-install"]
+  [make "PREFIX=%{prefix}%"]
+  [make "install" "PREFIX=%{prefix}%"]
 ]
-remove: ["ocamlfind" "remove" "mirage-console-xen"]
+remove: ["ocamlfind" "remove" "mirage-console"]
 depends: [
   "ocamlfind"
   "lwt"

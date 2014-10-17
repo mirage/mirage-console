@@ -1,11 +1,11 @@
 .PHONY: all clean install build
 all: build doc
 
-J=4
+J=2
 
-ENABLE_MIRAGE_XEN ?= $(shell if ocamlfind query mirage-xen >/dev/null 2>&1; then echo --enable-miragexen; else echo --disable-miragexen; fi)
-
-ENABLE_XEN ?= $(shell if ocamlfind query xen-gnt >/dev/null 2>&1; then echo --enable-xen; else echo --disable-xen; fi)
+ENABLE_MIRAGE_XEN ?= $(shell if ocamlfind query mirage-xen xenstore >/dev/null 2>&1; then echo --enable-miragexen; else echo --disable-miragexen; fi)
+ENABLE_XEN ?= $(shell if ocamlfind query xen-gnt xenstore_transport >/dev/null 2>&1; then echo --enable-xen; else echo --disable-xen; fi)
+PREFIX ?= /usr/local/bin
 
 export OCAMLRUNPARAM=b
 
@@ -14,28 +14,16 @@ setup.bin: setup.ml
 	@rm -f setup.cmx setup.cmi setup.o setup.cmo
 
 setup.data: setup.bin
-	./setup.bin -configure $(ENABLE_MIRAGE_XEN) $(ENABLE_XEN) --enable-tests
+	./setup.bin -configure $(ENABLE_MIRAGE_XEN) $(ENABLE_XEN) --enable-tests --prefix $(PREFIX)
 
 build: setup.data setup.bin
 	@./setup.bin -build -j $(J)
-
-# Legacy build target:
-xen-build: setup.bin
-	./setup.bin -configure $(ENABLE_MIRAGE_XEN) $(ENABLE_XEN) --disable-unix
-	./setup.bin -build -j $(J)
-
-unix-build: setup.bin
-	./setup.bin -configure --disable-miragexen --disable-xen --enable-unix
-	./setup.bin -build -j $(J)
 
 doc: setup.data setup.bin
 	@./setup.bin -doc -j $(J)
 
 install: setup.bin
 	@./setup.bin -install
-
-xen-install: install
-unix-install: install
 
 uninstall:
 	@./setup.bin -uninstall
