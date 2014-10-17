@@ -119,4 +119,4 @@
 # OASIS_STOP
 <cli/main.ml>: pkg_lwt.syntax, syntax_camlp4o
 <backend/conback.ml>: pkg_lwt.syntax, syntax_camlp4o
-<xen/console.ml>: pkg_lwt.syntax, syntax_camlp4o
+<xen/console_xen.ml>: pkg_lwt.syntax, syntax_camlp4o
