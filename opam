@@ -15,6 +15,7 @@ depends: [
   "ocamlfind"
   "lwt"
   "cstruct"
+  "ipaddr"
   "io-page"
   "mirage-types"
   "cmdliner"
