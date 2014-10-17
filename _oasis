@@ -28,7 +28,7 @@ Library "mirage-console"
 
 Library mirage_console_proto
   CompiledObject:     best
-  Build$:             flag(xen)
+  Build$:             flag(miragexen) || flag(xen)
   Path:               lib
   Findlibparent:      mirage-console
   Findlibname:        proto
