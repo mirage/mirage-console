@@ -1,0 +1,29 @@
+opam-version: "1"
+maintainer: "anil@recoil.org"
+version: "2.0.0"
+tags: [
+  "org:mirage"
+  "org:xapi-project"
+]
+build: [
+  [make "PREFIX=%{prefix}%"]
+  [make "install" "PREFIX=%{prefix}%"]
+]
+remove: ["ocamlfind" "remove" "mirage-console"]
+depends: [
+  "ocamlfind"
+  "lwt"
+  "cstruct"
+  "ipaddr"
+  "io-page"
+  "mirage-types"
+  "cmdliner"
+]
+depopts: [
+  ("mirage-xen" & "xenstore" & "xen-gnt" & "xen-evtchn")
+  ("shared-memory-ring" & "xen-gnt" & "xen-evtchn" & "xenstore" & "xenstore_transport")
+]
+conflicts: [
+  "mirage-xen" { <"1.1.0" }
+  "mirage-types" { <"1.1.0" }
+]
