@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 8716c87636146beead1b05550758462a)
+# DO NOT EDIT (digest: 5afa930582817c5eae0d57eda7f54d81)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -13,15 +13,15 @@
 ".git": not_hygienic
 "_darcs": -traverse
 "_darcs": not_hygienic
-# Library mirage_console
-"lib/mirage_console.cmxs": use_mirage_console
+# Library mirage-console
+"lib/mirage-console.cmxs": use_mirage-console
 # Library mirage_console_proto
 "lib/mirage_console_proto.cmxs": use_mirage_console_proto
 <lib/*.ml{,i}>: pkg_lwt
 <lib/*.ml{,i}>: pkg_mirage-types
 <lib/*.ml{,i}>: pkg_mirage-types.lwt
 <lib/*.ml{,i}>: pkg_xenstore
-<lib/*.ml{,i}>: use_mirage_console
+<lib/*.ml{,i}>: use_mirage-console
 # Library mirage_console_backend
 "backend/mirage_console_backend.cmxs": use_mirage_console_backend
 <backend/*.ml{,i}>: pkg_lwt
@@ -32,7 +32,7 @@
 <backend/*.ml{,i}>: pkg_xen-evtchn
 <backend/*.ml{,i}>: pkg_xen-gnt
 <backend/*.ml{,i}>: pkg_xenstore
-<backend/*.ml{,i}>: use_mirage_console
+<backend/*.ml{,i}>: use_mirage-console
 <backend/*.ml{,i}>: use_mirage_console_proto
 # Library mirage_console_xen
 "xen/mirage_console_xen.cmxs": use_mirage_console_xen
@@ -44,7 +44,7 @@
 <xen/*.ml{,i}>: pkg_xen-evtchn
 <xen/*.ml{,i}>: pkg_xen-gnt
 <xen/*.ml{,i}>: pkg_xenstore
-<xen/*.ml{,i}>: use_mirage_console
+<xen/*.ml{,i}>: use_mirage-console
 <xen/*.ml{,i}>: use_mirage_console_proto
 # Library mirage_console_unix
 "unix/mirage_console_unix.cmxs": use_mirage_console_unix
@@ -53,7 +53,7 @@
 <unix/*.ml{,i}>: pkg_lwt.unix
 <unix/*.ml{,i}>: pkg_mirage-types
 <unix/*.ml{,i}>: pkg_mirage-types.lwt
-<unix/*.ml{,i}>: use_mirage_console
+<unix/*.ml{,i}>: use_mirage-console
 # Executable mirage_console_cli
 <cli/main.{native,byte}>: pkg_cmdliner
 <cli/main.{native,byte}>: pkg_cstruct.lwt
@@ -74,7 +74,7 @@
 <cli/main.{native,byte}>: pkg_xenstore.client
 <cli/main.{native,byte}>: pkg_xenstore_transport
 <cli/main.{native,byte}>: pkg_xenstore_transport.lwt
-<cli/main.{native,byte}>: use_mirage_console
+<cli/main.{native,byte}>: use_mirage-console
 <cli/main.{native,byte}>: use_mirage_console_backend
 <cli/main.{native,byte}>: use_mirage_console_proto
 <cli/main.{native,byte}>: use_mirage_console_unix
@@ -97,13 +97,25 @@
 <cli/*.ml{,i}>: pkg_xenstore.client
 <cli/*.ml{,i}>: pkg_xenstore_transport
 <cli/*.ml{,i}>: pkg_xenstore_transport.lwt
-<cli/*.ml{,i}>: use_mirage_console
+<cli/*.ml{,i}>: use_mirage-console
 <cli/*.ml{,i}>: use_mirage_console_backend
 <cli/*.ml{,i}>: use_mirage_console_proto
 <cli/*.ml{,i}>: use_mirage_console_unix
 # Executable portable
-<lib_test/portable.{native,byte}>: pkg_mirage-console-unix
-<lib_test/*.ml{,i}>: pkg_mirage-console-unix
+<lib_test/portable.{native,byte}>: pkg_cstruct.lwt
+<lib_test/portable.{native,byte}>: pkg_lwt
+<lib_test/portable.{native,byte}>: pkg_lwt.unix
+<lib_test/portable.{native,byte}>: pkg_mirage-types
+<lib_test/portable.{native,byte}>: pkg_mirage-types.lwt
+<lib_test/portable.{native,byte}>: use_mirage-console
+<lib_test/portable.{native,byte}>: use_mirage_console_unix
+<lib_test/*.ml{,i}>: pkg_cstruct.lwt
+<lib_test/*.ml{,i}>: pkg_lwt
+<lib_test/*.ml{,i}>: pkg_lwt.unix
+<lib_test/*.ml{,i}>: pkg_mirage-types
+<lib_test/*.ml{,i}>: pkg_mirage-types.lwt
+<lib_test/*.ml{,i}>: use_mirage-console
+<lib_test/*.ml{,i}>: use_mirage_console_unix
 # OASIS_STOP
 <cli/main.ml>: pkg_lwt.syntax, syntax_camlp4o
 <backend/conback.ml>: pkg_lwt.syntax, syntax_camlp4o

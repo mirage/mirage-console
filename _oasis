@@ -19,7 +19,7 @@ Flag miragexen
   Description:        true to build Xen kernelspace console
   Default:            false
 
-Library mirage_console
+Library "mirage-console"
   CompiledObject:     best
   Path:               lib
   Findlibname:        mirage-console
@@ -30,7 +30,7 @@ Library mirage_console_proto
   CompiledObject:     best
   Build$:             flag(xen)
   Path:               lib
-  Findlibparent:      mirage_console
+  Findlibparent:      mirage-console
   Findlibname:        proto
   Modules:            Conproto
   BuildDepends:       xenstore, mirage-console
@@ -39,7 +39,7 @@ Library mirage_console_backend
   Build$:             flag(xen)
   CompiledObject:     best
   Path:               backend
-  Findlibparent:      mirage_console
+  Findlibparent:      mirage-console
   Findlibname:        backend
   Modules:            Conback
   BuildDepends:       lwt, xenstore, mirage-console.proto, xen-gnt, xen-evtchn, mirage-types, mirage-types.lwt, shared-memory-ring, shared-memory-ring.console
@@ -48,7 +48,7 @@ Library mirage_console_xen
   Build$:             flag(miragexen)
   CompiledObject:     best
   Path:               xen
-  Findlibparent:      mirage_console
+  Findlibparent:      mirage-console
   Findlibname:        xen
   Modules:            Console
   BuildDepends:       lwt, mirage-types, mirage-xen, io-page, xen-gnt, xen-evtchn, mirage-console.proto
@@ -57,7 +57,7 @@ Library mirage_console_unix
   Build$:             flag(unix)
   CompiledObject:     best
   Path:               unix
-  Findlibparent:      mirage_console
+  Findlibparent:      mirage-console
   Findlibname:        unix
   Modules:            Console
   BuildDepends:       lwt, lwt.unix, mirage-types, mirage-console, cstruct.lwt
@@ -76,7 +76,7 @@ Executable portable
   Install:            false
   Path:               lib_test
   MainIs:             portable.ml
-  BuildDepends:       mirage-console-unix
+  BuildDepends:       mirage-console.unix
 
 Test portable_test
   Run$:               flag(tests)
