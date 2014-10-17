@@ -31,6 +31,6 @@ opam remove mirage-console
 
 opam install mirage-xen xenstore mirage-console -v
 opam remove mirage-console mirage-xen xenstore
-opam install shared-memory-ring xen-gnt xen-evtchn xenstore mirage-console -v
-opam remove mirage-xen mirage-console shared-memory-ring xen-gnt xen-evtchn xenstore
+opam install shared-memory-ring xen-gnt xen-evtchn xenstore mirage-console xenstore_transport -v
+opam remove mirage-xen mirage-console shared-memory-ring xen-gnt xen-evtchn xenstore xenstore_transport
 opam install mirage-console -v
