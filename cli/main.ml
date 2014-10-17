@@ -108,7 +108,7 @@ let connect' (vm: string) (name: string option) =
     | Some name -> Printf.fprintf stderr "Device has 'name = %s', look for a device in /dev/xenconsole/%s\n%!" name name);
   let device = vm, devid in
 
-  let module M = Conback.Make(Unix_activations)(Client)(Console) in
+  let module M = Conback.Make(Unix_activations)(Client)(Console_unix) in
 
   (* If we're asked to shutdown cleanly, first initiate a hot-unplug.
      If we're asked again, be more aggressive. *)
@@ -154,7 +154,7 @@ let plug' ?(backend="0") (vm: string) (name: string option) =
     | None -> Printf.fprintf stderr "Device has no 'name', default rules will apply and it will become /dev/hvcX\n%!"
     | Some name -> Printf.fprintf stderr "Device has 'name = %s', look for a device in /dev/xenconsole/%s\n%!" name name);
   let device = vm, devid in
-  let module M = Conback.Make(Unix_activations)(Client)(Console) in
+  let module M = Conback.Make(Unix_activations)(Client)(Console_unix) in
   lwt () = M.create ?name ~backend_domid:backend "console" device in
   Printf.fprintf stderr "Device connection initiated\n%!";
   return ()

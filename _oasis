@@ -50,7 +50,7 @@ Library mirage_console_xen
   Path:               xen
   Findlibparent:      mirage-console
   Findlibname:        xen
-  Modules:            Console
+  Modules:            Console_xen
   BuildDepends:       lwt, mirage-types, mirage-xen, io-page, xen-gnt, xen-evtchn, mirage-console.proto
 
 Library mirage_console_unix
@@ -59,7 +59,7 @@ Library mirage_console_unix
   Path:               unix
   Findlibparent:      mirage-console
   Findlibname:        unix
-  Modules:            Console
+  Modules:            Console_unix
   BuildDepends:       lwt, lwt.unix, mirage-types, mirage-console, cstruct.lwt
 
 Executable mirage_console_cli
