@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 5afa930582817c5eae0d57eda7f54d81)
+# DO NOT EDIT (digest: ffc65d93c66517e098f40517585f8e46)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -53,6 +53,7 @@
 <unix/*.ml{,i}>: pkg_lwt.unix
 <unix/*.ml{,i}>: pkg_mirage-types
 <unix/*.ml{,i}>: pkg_mirage-types.lwt
+<unix/*.ml{,i}>: pkg_mirage-unix
 <unix/*.ml{,i}>: use_mirage-console
 # Executable mirage_console_cli
 <cli/main.{native,byte}>: pkg_cmdliner
@@ -63,6 +64,7 @@
 <cli/main.{native,byte}>: pkg_lwt.unix
 <cli/main.{native,byte}>: pkg_mirage-types
 <cli/main.{native,byte}>: pkg_mirage-types.lwt
+<cli/main.{native,byte}>: pkg_mirage-unix
 <cli/main.{native,byte}>: pkg_shared-memory-ring
 <cli/main.{native,byte}>: pkg_shared-memory-ring.console
 <cli/main.{native,byte}>: pkg_xen-evtchn
@@ -86,6 +88,7 @@
 <cli/*.ml{,i}>: pkg_lwt.unix
 <cli/*.ml{,i}>: pkg_mirage-types
 <cli/*.ml{,i}>: pkg_mirage-types.lwt
+<cli/*.ml{,i}>: pkg_mirage-unix
 <cli/*.ml{,i}>: pkg_shared-memory-ring
 <cli/*.ml{,i}>: pkg_shared-memory-ring.console
 <cli/*.ml{,i}>: pkg_xen-evtchn
@@ -107,6 +110,7 @@
 <lib_test/portable.{native,byte}>: pkg_lwt.unix
 <lib_test/portable.{native,byte}>: pkg_mirage-types
 <lib_test/portable.{native,byte}>: pkg_mirage-types.lwt
+<lib_test/portable.{native,byte}>: pkg_mirage-unix
 <lib_test/portable.{native,byte}>: use_mirage-console
 <lib_test/portable.{native,byte}>: use_mirage_console_unix
 <lib_test/*.ml{,i}>: pkg_cstruct.lwt
@@ -114,6 +118,7 @@
 <lib_test/*.ml{,i}>: pkg_lwt.unix
 <lib_test/*.ml{,i}>: pkg_mirage-types
 <lib_test/*.ml{,i}>: pkg_mirage-types.lwt
+<lib_test/*.ml{,i}>: pkg_mirage-unix
 <lib_test/*.ml{,i}>: use_mirage-console
 <lib_test/*.ml{,i}>: use_mirage_console_unix
 # OASIS_STOP
