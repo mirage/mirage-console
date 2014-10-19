@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: ec65dc855dc7dc74a41f42b64c5d50ad)
+# DO NOT EDIT (digest: 039d7022fa93a283c3b77bf42dbd122f)
 version = "2.0.0"
 description = "Console implementation for both Xen and Unix"
 requires = "lwt mirage-types mirage-types.lwt"
@@ -23,7 +23,8 @@ package "xen" (
 package "unix" (
  version = "2.0.0"
  description = "Console implementation for both Xen and Unix"
- requires = "lwt lwt.unix mirage-types mirage-console cstruct.lwt"
+ requires =
+ "lwt lwt.unix mirage-types mirage-console cstruct.lwt mirage-unix"
  archive(byte) = "mirage_console_unix.cma"
  archive(byte, plugin) = "mirage_console_unix.cma"
  archive(native) = "mirage_console_unix.cmxa"

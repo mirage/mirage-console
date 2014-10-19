@@ -60,7 +60,7 @@ Library mirage_console_unix
   Findlibparent:      mirage-console
   Findlibname:        unix
   Modules:            Console_unix
-  BuildDepends:       lwt, lwt.unix, mirage-types, mirage-console, cstruct.lwt
+  BuildDepends:       lwt, lwt.unix, mirage-types, mirage-console, cstruct.lwt, mirage-unix
 
 Executable mirage_console_cli
   Build$:             flag(xen) && flag(unix)
