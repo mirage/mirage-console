@@ -4,7 +4,7 @@ all: build doc
 J=2
 
 ENABLE_MIRAGE_XEN ?= $(shell if ocamlfind query mirage-xen xenstore >/dev/null 2>&1; then echo --enable-miragexen; else echo --disable-miragexen; fi)
-ENABLE_XEN ?= $(shell if ocamlfind query xen-gnt xenstore_transport >/dev/null 2>&1; then echo --enable-xen; else echo --disable-xen; fi)
+ENABLE_XEN ?= $(shell if ocamlfind query xen-gnt.unix xenstore_transport >/dev/null 2>&1; then echo --enable-xen; else echo --disable-xen; fi)
 PREFIX ?= /usr/local/bin
 
 export OCAMLRUNPARAM=b
