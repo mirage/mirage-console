@@ -27,6 +27,7 @@ opam remote add mirage git://github.com/mirage/mirage-dev
 
 opam pin $pinx mirage-console .
 
+eval `opam config env`
 make
 make test
 
