@@ -1,4 +1,4 @@
-2.0.0 (unreleased)
+2.0.0 (31-10-2014)
 * enable travis (for both xen and unix cases)
 * fix dependencies: drop mirage-{xen,unix}; keep dependencies on implementation
   libraries and mirage-types
