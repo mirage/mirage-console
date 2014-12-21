@@ -98,10 +98,9 @@ let plug id =
   return t
 
 (** Return a list of available consoles *)
-let enumerate () =
-  Xs.make () >>= fun xs ->
+let enumerate h =
   try_lwt
-    Xs.(immediate xs (fun h -> directory h "device/console"))
+    Xs.(directory h "device/console")
   with
   | Xs_protocol.Enoent _ ->
     return []
@@ -160,21 +159,27 @@ let connect id =
       let d = Hashtbl.find devices id in
       return (`Ok d)
     end else begin
-      enumerate () >>= fun all ->
-      names_to_ids all >>= fun list ->
-      if List.mem_assoc id list then begin
-        let id' = List.assoc id list in
-        printf "Console.connect %s: opening device %s\n" id id';
-        plug id' >>= fun d ->
-        let names = List.map fst (List.filter (fun (_, v) -> v = id') list) in
-        List.iter (fun name -> Hashtbl.replace devices name d) names;
-        return (`Ok d)
-      end else begin
-        printf "Connect.connect %s: could not find device\n" id;
-        return (`Error (`Invalid_console
-                        (Printf.sprintf "device %s not found (available = [ %s ])"
-                           id (String.concat ", " all))))
-      end
+      (* Wait forever for the device id or name to appear *)
+      let printed_message = ref false in
+      Xs.make () >>= fun xs ->
+      Xs.(wait xs (fun h ->
+        enumerate h >>= fun all ->
+        names_to_ids all >>= fun list ->
+        if List.mem_assoc id list
+        then return (List.assoc id list, list)
+        else begin
+          if not !printed_message then begin
+            printed_message := true;
+            printf "Console.connect %s: doesn't currently exist, waiting for hotplug\n%!" id
+          end;
+          fail Xs_protocol.Eagain
+        end
+      )) >>= fun (id', list) ->
+      printf "Console.connect %s: opening device %s\n" id id';
+      plug id' >>= fun d ->
+      let names = List.map fst (List.filter (fun (_, v) -> v = id') list) in
+      List.iter (fun name -> Hashtbl.replace devices name d) names;
+      return (`Ok d)
     end
   end
 
