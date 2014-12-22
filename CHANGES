@@ -1,7 +1,8 @@
-trunk (unreleased)
+2.1.0 (23-12-2014)
 * [xen]: for secondary consoles, Console.connect blocks in a watch waiting for
   a hotplug. This allows stand-alone console servers time to connect (such as
   xentropyd)
+
 2.0.0 (31-10-2014)
 * enable travis (for both xen and unix cases)
 * fix dependencies: drop mirage-{xen,unix}; keep dependencies on implementation
