@@ -30,6 +30,9 @@ type 'a io = 'a Lwt.t
 type error = [ `Invalid_console of string ]
 type buffer = Cstruct.t
 
+let error_message (`Invalid_console msg) =
+  Printf.sprintf "Invalid console '%s'" msg
+
 let connect id =
   let read_buffer = Cstruct.create 1024 in
   let closed = false in

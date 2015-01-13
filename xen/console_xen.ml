@@ -32,7 +32,9 @@ type 'a io = 'a Lwt.t
 
 type error = [ `Invalid_console of string ]
 type id = string
-exception Internal_error of string
+
+let error_message (`Invalid_console msg) =
+  Printf.sprintf "Invalid console '%s'" msg
 
 let h = Eventchn.init ()
 let id { id } = string_of_int id
