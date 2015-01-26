@@ -19,4 +19,5 @@
      with type 'a io = 'a Lwt.t
      with type id = string
 
+   val connect : string -> [`Ok of t | `Error of error] io
 end
