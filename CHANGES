@@ -1,3 +1,7 @@
+2.1.2 (07-03-2015)
+* Add an explicit `connect` function to interface. (#34)
+* Modernise Travis scripts with central sourcing.
+
 2.1.1 (23-01-2015)
 * Add an `error_message` function to turn an `error` into a string.
 
