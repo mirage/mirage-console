@@ -14,16 +14,13 @@ tags: [
 build: [make
          "PREFIX=%{prefix}%"
          "ENABLE_MIRAGE_XEN=--%{mirage-xen+xenstore+xen-gnt+xen-evtchn:enable}%-miragexen"
-         "ENABLE_XEN=--%{shared-memory-ring+xen-gnt+xen-evtchn+xenstore+xenstore_transport:enable}%-xen" ]
+         "ENABLE_XEN=--%{shared-memory-ring+xen-gnt+xen-evtchn+xenstore+xenstore_transport:enable}%-xen" 
+         "ENABLE_XENCTRL=--%{xenctrl+xen-evtchn+xen-gnt:enable}%-xenctrl" ]
 install: [make "install" "PREFIX=%{prefix}%"]
 remove: ["ocamlfind" "remove" "mirage-console"]
 depends: [
   "ocamlfind" {build}
-  "lwt"
-  "cstruct"
-  "ipaddr"
-  "io-page"
-  "mirage-types"
+  "mirage-types-lwt"
   "cmdliner"
   "mirage-unix" {>="1.1.0"}
 ]
@@ -38,5 +35,4 @@ depopts: [
 ]
 conflicts: [
   "mirage-xen" { <"1.1.0" }
-  "mirage-types" { <"1.1.0" }
 ]
