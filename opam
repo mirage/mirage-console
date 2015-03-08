@@ -15,7 +15,7 @@ build: [make
          "PREFIX=%{prefix}%"
          "ENABLE_MIRAGE_XEN=--%{mirage-xen+xenstore+xen-gnt+xen-evtchn:enable}%-miragexen"
          "ENABLE_XEN=--%{shared-memory-ring+xen-gnt+xen-evtchn+xenstore+xenstore_transport:enable}%-xen" 
-         "ENABLE_XENCTRL=--%{xenctrl:enable}%-xenctrl" ]
+         "ENABLE_XENCTRL=--%{xenctrl+xen-evtchn+xen-gnt:enable}%-xenctrl" ]
 install: [make "install" "PREFIX=%{prefix}%"]
 remove: ["ocamlfind" "remove" "mirage-console"]
 depends: [
@@ -32,7 +32,6 @@ depopts: [
   "shared-memory-ring"
   "xenstore"
   "xenstore_transport"
-  "xenctrl"
 ]
 conflicts: [
   "mirage-xen" { <"1.1.0" }
