@@ -1,6 +1,7 @@
-2.1.2 (07-03-2015)
+2.1.2 (08-03-2015)
 * Add an explicit `connect` function to interface. (#34)
 * Modernise Travis scripts with central sourcing.
+* Only build Unix executable if relevant `xenctrl` libraries are installed.
 
 2.1.1 (23-01-2015)
 * Add an `error_message` function to turn an `error` into a string.
