@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        mirage-console
-Version:     2.1.2
+Version:     2.1.3
 Synopsis:    Console implementation for both Xen and Unix
 Authors:     Anil Madhavapeddy, David Scott
 License:     ISC
@@ -17,6 +17,10 @@ Flag xen
 
 Flag miragexen
   Description:        true to build Xen kernelspace console
+  Default:            false
+
+Flag xenctrl
+  Description:        true to depend on Unix xenctrl libraries
   Default:            false
 
 Library "mirage-console"
@@ -63,7 +67,7 @@ Library mirage_console_unix
   BuildDepends:       lwt, lwt.unix, mirage-types, mirage-console, cstruct.lwt, mirage-unix
 
 Executable mirage_console_cli
-  Build$:             flag(xen) && flag(unix)
+  Build$:             flag(xenctrl) && flag(unix)
   CompiledObject:     best
   Install:            false
   Path:               cli

@@ -5,7 +5,8 @@ J=2
 
 ENABLE_MIRAGE_XEN ?= $(shell if ocamlfind query mirage-xen xenstore >/dev/null 2>&1; then echo --enable-miragexen; else echo --disable-miragexen; fi)
 ENABLE_XEN ?= $(shell if ocamlfind query xen-gnt.unix xenstore_transport >/dev/null 2>&1; then echo --enable-xen; else echo --disable-xen; fi)
-ENABLE_UNIX ?= $(shell if ocamlfind query xen-evtchn.unix.activations xen-evtchn.unix xen-gnt.unix >/dev/null 2>&1; then echo --enable-unix; else echo --disable-unix; fi)
+ENABLE_XENCTRL ?= $(shell if ocamlfind query xen-evtchn.unix.activations xen-evtchn.unix xen-gnt.unix >/dev/null 2>&1; then echo --enable-xenctrl; else echo --disable-xenctrl; fi)
+ENABLE_UNIX ?= --enable-unix
 PREFIX ?= /usr/local/bin
 
 export OCAMLRUNPARAM=b
@@ -15,7 +16,7 @@ setup.bin: setup.ml
 	@rm -f setup.cmx setup.cmi setup.o setup.cmo
 
 setup.data: setup.bin
-	./setup.bin -configure $(ENABLE_MIRAGE_XEN) $(ENABLE_XEN) $(ENABLE_UNIX) --enable-tests --prefix $(PREFIX)
+	./setup.bin -configure $(ENABLE_XENCTRL) $(ENABLE_MIRAGE_XEN) $(ENABLE_XEN) $(ENABLE_UNIX) --enable-tests --prefix $(PREFIX)
 
 build: setup.data setup.bin
 	@./setup.bin -build -j $(J)
