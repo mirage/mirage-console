@@ -17,7 +17,6 @@
  module type CONSOLE = sig
    include V1_LWT.CONSOLE
      with type 'a io = 'a Lwt.t
-     with type id = string
 
    val connect : string -> [`Ok of t | `Error of error] io
 end
