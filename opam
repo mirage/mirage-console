@@ -3,6 +3,7 @@ maintainer:    "anil@recoil.org"
 homepage:      "https://github.com/mirage/mirage-console"
 bug-reports:   "https://github.com/mirage/mirage-console/issues"
 dev-repo:      "https://github.com/mirage/mirage-console.git"
+license:       "ISC"
 authors: [
   "Anil Madhavapeddy"
   "David Scott"
