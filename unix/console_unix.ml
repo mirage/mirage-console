@@ -37,7 +37,7 @@ let connect id =
   let read_buffer = Cstruct.create 1024 in
   let closed = false in
   let t = { id; read_buffer; closed } in
-  return (`Ok t)
+  return t
 
 let disconnect _t = return ()
 let id {id} = id

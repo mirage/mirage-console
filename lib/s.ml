@@ -18,5 +18,5 @@
    include V1_LWT.CONSOLE
      with type 'a io = 'a Lwt.t
 
-   val connect : string -> [`Ok of t | `Error of error] io
+   val connect : string -> t io
 end
