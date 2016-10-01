@@ -53,15 +53,6 @@ type t = {
   ring:   Cstruct.t;
 }
 
-module ConsoleError = struct
-  open Lwt
-  let (>>=) x f = x >>= function
-  | `Ok x -> f x
-  | `Error (`Invalid_console x) -> fail (Failure (Printf.sprintf "Invalid_console %s" x))
-  | `Error _ -> fail (Failure "unknown console device failure")
-end
-
-
 module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: S.CONSOLE) = struct
 
   let service_thread t c stats =
@@ -185,10 +176,10 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: S.CONSOLE) = struct
     let xg = Gnttab.interface_open () in
     let xe = Eventchn.init () in
 
-    let open ConsoleError in
-    C.connect id >>= fun t ->
-    let ( >>= ) = Lwt.bind in
+    lwt t = C.connect id in
     lwt backend_path = mk_backend_path client backend_name (domid,devid) in
+
+    let (>>=) = Lwt.bind in
 
     try_lwt
 

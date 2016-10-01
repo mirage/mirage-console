@@ -155,11 +155,11 @@ let connect id =
   if id = "0" || id = "" then begin
     let t = get_initial_console () in
     Hashtbl.replace devices id t;
-    return (`Ok t)
+    return t
   end else begin
     if Hashtbl.mem devices id then begin
       let d = Hashtbl.find devices id in
-      return (`Ok d)
+      return d
     end else begin
       (* Wait forever for the device id or name to appear *)
       let printed_message = ref false in
@@ -181,12 +181,12 @@ let connect id =
       plug id' >>= fun d ->
       let names = List.map fst (List.filter (fun (_, v) -> v = id') list) in
       List.iter (fun name -> Hashtbl.replace devices name d) names;
-      return (`Ok d)
+      return d
     end
   end
 
 let disconnect _id =
-  return ()
+  return_unit
 
 type buffer = Cstruct.t
 
