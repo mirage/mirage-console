@@ -25,7 +25,6 @@ type t = {
   mutable closed: bool;
 }
 
-type id = string
 type 'a io = 'a Lwt.t
 type error = [ `Invalid_console of string ]
 type buffer = Cstruct.t
