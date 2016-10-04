@@ -31,13 +31,11 @@ type t = {
 type 'a io = 'a Lwt.t
 
 type error = [ `Invalid_console of string ]
-type id = string
 
 let error_message (`Invalid_console msg) =
   Printf.sprintf "Invalid console '%s'" msg
 
 let h = Eventchn.init ()
-let id { id } = string_of_int id
 
 (* There are 2 console setup protocols in use. For the first console (index 0)
    the xenstore frontend is in /local/domain/$d/console, and usually contains

@@ -3,6 +3,9 @@ install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.t
 script: bash -ex .travis-opam.sh
 dist: trusty
 env:
+  global:
+  - EXTRA_REMOTES="https://github.com/mirage/mirage-dev.git"
+  matrix:
   - OCAML_VERSION=4.02 PACKAGE="mirage-console" DEPOPTS="mirage-xen xenstore xenstore_transport xen-gnt xen-evtchn shared-memory-ring"
   - OCAML_VERSION=4.03 PACKAGE="mirage-console" DEPOPTS="mirage-xen xenstore xenstore_transport xen-gnt xen-evtchn shared-memory-ring"
   - OCAML_VERSION=4.03 PACKAGE="mirage-console" DEPOPTS="xenctrl mirage-xen xenstore xenstore_transport xen-gnt xen-evtchn shared-memory-ring"
