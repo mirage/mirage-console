@@ -5,7 +5,9 @@ dist: trusty
 env:
   global:
   - EXTRA_REMOTES="https://github.com/mirage/mirage-dev.git"
+  - PINS="mirage-console-xen-proto:. mirage-console-xen-backend:. mirage-console-unix:."
   matrix:
-  - OCAML_VERSION=4.02 PACKAGE="mirage-console" DEPOPTS="mirage-xen xenstore xenstore_transport xen-gnt xen-evtchn shared-memory-ring"
-  - OCAML_VERSION=4.03 PACKAGE="mirage-console" DEPOPTS="mirage-xen xenstore xenstore_transport xen-gnt xen-evtchn shared-memory-ring"
-  - OCAML_VERSION=4.03 PACKAGE="mirage-console" DEPOPTS="xenctrl mirage-xen xenstore xenstore_transport xen-gnt xen-evtchn shared-memory-ring"
+  - OCAML_VERSION=4.02 PACKAGE="mirage-console-unix"
+  - OCAML_VERSION=4.02 PACKAGE="mirage-console-xen"
+  - OCAML_VERSION=4.03 PACKAGE="mirage-console-xen-cli"
+  - OCAML_VERSION=4.03 PACKAGE="mirage-console-xen-backend"

@@ -16,23 +16,22 @@
 
 let project_url = "http://github.com/mirage/mirage-console"
 
-open Lwt
-open Conproto
-open Xs_protocol
+open Lwt.Infix
 module Client = Xs_client_lwt.Client(Xs_transport_lwt_unix_client)
-open Client
+open Result
 
 let backend_name =
   let sanitise x =
     let x' = String.length x in
-    let y = String.create x' in
+    let y = Bytes.create x' in
     for i = 0 to x' - 1 do
-      y.[i] <- match x.[i] with
-               | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' -> x.[i]
-               | _ -> '_'
+      Bytes.set y i
+        (match x.[i] with
+         | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' -> x.[i]
+         | _ -> '_')
     done;
     y in
- sanitise (Filename.basename Sys.argv.(0))
+  sanitise (Filename.basename Sys.argv.(0))
 
 module Common = struct
   type t = {
@@ -44,68 +43,82 @@ module Common = struct
   let make verbose debug = { verbose; debug }
 end
 
-let ( >>= ) = Conproto.( >>= )
-
 let logger = Lwt_log.channel ~close_mode:`Keep ~channel:Lwt_io.stdout ()
 
-let read_one client k = immediate client (fun xs ->
-  try_lwt
-    lwt v = read xs k in
-    return (`OK v)
-  with _ -> return (`Error ("failed to read: " ^ k)))
+let read_one client k =
+  Client.immediate client (fun xs ->
+      Lwt.catch
+        (fun () -> Client.read xs k >|= fun v -> Ok v)
+        (fun _ -> Lwt.return (Error ("failed to read: " ^ k)))
+    )
 
-let exists client k = match_lwt read_one client k with `Error _ -> return false | _ -> return true
+let exists client k =
+  read_one client k >|= function
+  | Error _ -> false
+  | Ok _    -> true
 
 let find_vm client vm =
   (* First interpret as a domain ID, then UUID, then name *)
   let domainpath x = "/local/domain/" ^ x in
-  lwt e = exists client (domainpath vm) in
+  exists client (domainpath vm) >>= fun e ->
   if e
-  then return (Some (int_of_string vm))
+  then Lwt.return (Some (int_of_string vm))
   else begin
-    lwt valid_domids = immediate client (fun xs -> directory xs "/local/domain") in
-    lwt valid_uuids = Lwt_list.map_s (fun d ->
-      match_lwt read_one client ("/local/domain/" ^ d ^ "/vm") with
-      | `OK path -> return (Some (Filename.basename path))
-      | `Error _ -> return None
-    ) valid_domids in
-    lwt valid_names = Lwt_list.map_s (fun d ->
-      match_lwt read_one client ("/local/domain/" ^ d ^ "/name") with
-      | `OK path -> return (Some path)
-      | `Error _ -> return None
-    ) valid_domids in
+    Client.immediate client
+      (fun xs -> Client.directory xs "/local/domain") >>= fun valid_domids ->
+    Lwt_list.map_s (fun d ->
+        read_one client ("/local/domain/" ^ d ^ "/vm") >|= function
+        | Ok path -> Some (Filename.basename path)
+        | Error _ -> None
+      ) valid_domids
+    >>= fun valid_uuids ->
+    Lwt_list.map_s (fun d ->
+        read_one client ("/local/domain/" ^ d ^ "/name") >|= function
+        | Ok path -> Some path
+        | Error _ -> None
+      ) valid_domids
+    >|= fun valid_names ->
     let uuids_to_domids = List.combine valid_uuids valid_domids in
     let names_to_domids = List.combine valid_names valid_domids in
     if List.mem_assoc (Some vm) uuids_to_domids
-    then return (Some (int_of_string (List.assoc (Some vm) uuids_to_domids)))
+    then Some (int_of_string (List.assoc (Some vm) uuids_to_domids))
     else if List.mem_assoc (Some vm) names_to_domids
-    then return (Some (int_of_string (List.assoc (Some vm) names_to_domids)))
-    else return None
+    then Some (int_of_string (List.assoc (Some vm) names_to_domids))
+    else None
   end
 
-let (|>) a b = b a
 let find_free_console client vm =
-  lwt used = immediate client (fun xs -> try_lwt directory xs (Printf.sprintf "/local/domain/%d/device/console" vm) with Xs_protocol.Enoent _ -> return []) in
-  let free =
-    used
-    |> List.map (fun x -> try Some (int_of_string x) with _ -> None)
-    |> List.fold_left (fun acc this -> match this with Some x -> x :: acc | None -> acc) []
-    |> List.fold_left max 0 (* console 0 is handled specially *)
-    |> (fun x -> x + 1) in
-  return free
+  Client.immediate client (fun xs ->
+      Lwt.catch (fun () ->
+          Client.directory xs
+            (Printf.sprintf "/local/domain/%d/device/console" vm)
+        ) (function Xs_protocol.Enoent _ -> Lwt.return [] | e -> Lwt.fail e)
+    )
+  >|= fun used ->
+  used
+  |> List.map (fun x -> try Some (int_of_string x) with _ -> None)
+  |> List.fold_left
+    (fun acc this -> match this with Some x -> x :: acc | None -> acc) []
+  |> List.fold_left max 0 (* console 0 is handled specially *)
+  |> (fun x -> x + 1)
 
 let connect' (vm: string) (name: string option) =
-  lwt client = make () in
+  Client.make () >>= fun client ->
   (* Figure out where the device is going to go: *)
-  lwt vm = match_lwt find_vm client vm with
-    | Some vm -> return vm
-    | None -> fail (Failure (Printf.sprintf "Failed to find VM %s" vm)) in
+  (find_vm client vm >>= function
+  | Some vm -> Lwt.return vm
+  | None    -> Lwt.fail (Failure (Printf.sprintf "Failed to find VM %s" vm)))
+  >>= fun vm ->
   Printf.fprintf stderr "Operating on VM domain id: %d\n%!" vm;
-  lwt devid = find_free_console client vm in
+  find_free_console client vm >>= fun devid ->
   Printf.fprintf stderr "Creating device/console/%d\n" devid;
   (match name with
-    | None -> Printf.fprintf stderr "Device has no 'name', default rules will apply and it will become /dev/hvcX\n%!"
-    | Some name -> Printf.fprintf stderr "Device has 'name = %s', look for a device in /dev/xenconsole/%s\n%!" name name);
+   | None ->
+     Printf.fprintf stderr "Device has no 'name', default rules will apply and \
+                            it will become /dev/hvcX\n%!"
+   | Some name ->
+     Printf.fprintf stderr "Device has 'name = %s', look for a device in \
+                            /dev/xenconsole/%s\n%!" name name);
   let device = vm, devid in
 
   let module M = Conback.Make(Unix_activations)(Client)(Console_unix) in
@@ -130,50 +143,54 @@ let connect' (vm: string) (name: string option) =
       ()
     ) [ Sys.sigint; Sys.sigterm ];
 
-  lwt () = M.create ?name backend_name device in
-  lwt stats = M.run "" backend_name device in
+  M.create ?name backend_name device >>= fun () ->
+  M.run "" backend_name device >>= fun stats ->
   Printf.fprintf stderr "# console stats\n";
   Printf.fprintf stderr "Total read:     %d\n" stats.Conback.total_read;
   Printf.fprintf stderr "Total written:  %d\n" stats.Conback.total_write;
   M.destroy backend_name device
 
 let plug' ?(backend="0") (vm: string) (name: string option) =
-  lwt client = make () in
+  Client.make () >>= fun client ->
   (* Figure out where the device is going to go: *)
-  lwt vm = match_lwt find_vm client vm with
-    | Some vm -> return vm
-    | None -> fail (Failure (Printf.sprintf "Failed to find VM %s" vm)) in
-  lwt backend = match_lwt find_vm client backend with
-    | Some vm -> return vm
-    | None -> fail (Failure (Printf.sprintf "Failed to find VM %s" backend)) in
+  (find_vm client vm >>= function
+    | Some vm -> Lwt.return vm
+    | None    -> Lwt.fail_with (Printf.sprintf "Failed to find VM %s" vm))
+  >>= fun vm ->
+  (find_vm client backend >>= function
+    | Some vm -> Lwt.return vm
+    | None    -> Lwt.fail_with (Printf.sprintf "Failed to find VM %s" backend))
+  >>= fun backend ->
   Printf.fprintf stderr "Backend VM domain id: %d\n" backend;
   Printf.fprintf stderr "Frontend VM domain id: %d\n%!" vm;
-  lwt devid = find_free_console client vm in
+  find_free_console client vm >>= fun devid ->
   Printf.fprintf stderr "Creating device/console/%d\n" devid;
   (match name with
-    | None -> Printf.fprintf stderr "Device has no 'name', default rules will apply and it will become /dev/hvcX\n%!"
-    | Some name -> Printf.fprintf stderr "Device has 'name = %s', look for a device in /dev/xenconsole/%s\n%!" name name);
+   | None ->
+     Printf.fprintf stderr "Device has no 'name', default rules will apply and \
+                            it will become /dev/hvcX\n%!"
+    | Some name -> Printf.fprintf stderr "Device has 'name = %s', look for a \
+                                          device in /dev/xenconsole/%s\n%!"
+                     name name);
   let device = vm, devid in
   let module M = Conback.Make(Unix_activations)(Client)(Console_unix) in
-  lwt () = M.create ?name ~backend_domid:backend "console" device in
-  Printf.fprintf stderr "Device connection initiated\n%!";
-  return ()
+  M.create ?name ~backend_domid:backend "console" device >|= fun () ->
+  Printf.fprintf stderr "Device connection initiated\n%!"
 
-let connect (common: Common.t) (vm: string) (name: string option) =
+let connect (_common: Common.t) (vm: string) (name: string option) =
   match vm with
-    | "" ->
-      `Error(true, "I don't know which VM to operate on. Please supply a VM name or uuid.")
-    | vm ->
-      let () = Lwt_main.run (connect' vm name) in
-      `Ok ()
+  | "" ->
+    `Error(true, "I don't know which VM to operate on. Please supply a VM name \
+                  or uuid.")
+  | vm -> Lwt_main.run (connect' vm name); `Ok ()
 
-let plug (common: Common.t) (backend: string option) (vm: string) (name: string option) =
+let plug (_common: Common.t) (backend: string option) (vm: string)
+    (name: string option) =
   match vm with
-    | "" ->
-      `Error(true, "I don't know which VM to operate on. Please supply a VM name or uuid.")
-    | vm ->
-      let () = Lwt_main.run (plug' ?backend vm name) in
-      `Ok ()
+  | "" ->
+    `Error(true, "I don't know which VM to operate on. Please supply a VM \
+                  name or uuid.")
+  | vm -> Lwt_main.run (plug' ?backend vm name); `Ok ()
 
 open Cmdliner
 

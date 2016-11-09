@@ -14,8 +14,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-open Lwt
-open Printf
+open Lwt.Infix
 
 (* TODO everything connects to the same console for now *)
 (* TODO management service for logging *)
@@ -36,18 +35,17 @@ let connect id =
   let read_buffer = Cstruct.create 1024 in
   let closed = false in
   let t = { id; read_buffer; closed } in
-  return t
+  Lwt.return t
 
-let disconnect _t = return ()
-let id {id} = id
+let disconnect _t = Lwt.return_unit
 
 let read t =
-  Lwt_bytes.read Lwt_unix.stdin t.read_buffer.Cstruct.buffer 0 (Cstruct.len t.read_buffer) >>= fun n ->
-  if n = 0 || t.closed
-  then return `Eof
-  else return (`Ok (Cstruct.sub t.read_buffer 0 n))
+  Lwt_bytes.read
+    Lwt_unix.stdin t.read_buffer.Cstruct.buffer 0 (Cstruct.len t.read_buffer)
+  >|= fun n ->
+  if n = 0 || t.closed then `Eof else `Ok (Cstruct.sub t.read_buffer 0 n)
 
-let write_one t buf =
+let write_one _t buf =
   Lwt_cstruct.complete
     (fun frag ->
        let open Cstruct in
@@ -55,26 +53,22 @@ let write_one t buf =
     ) buf
 
 let write t buf =
-  if t.closed then return `Eof
+  if t.closed then Lwt.return `Eof
   else
-    write_one t buf
-    >>= fun () ->
-    return (`Ok ())
+    write_one t buf >|= fun () ->
+    `Ok ()
 
 let writev t bufs =
-  if t.closed then return `Eof
+  if t.closed then Lwt.return `Eof
   else
-    Lwt_list.iter_s (write_one t) bufs
-    >>= fun () ->
-    return (`Ok ())
+    Lwt_list.iter_s (write_one t) bufs >|= fun () ->
+    `Ok ()
 
 let close t =
   t.closed <- true;
-  return ()
+  Lwt.return ()
 
-let write_string t buf off len = prerr_string (String.sub buf off len); flush stderr; len
-
-let log t s = prerr_endline s
+let log _t s = prerr_endline s
 
 let log_s t s =
   let s = s ^ "\n" in
