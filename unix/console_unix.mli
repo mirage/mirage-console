@@ -15,4 +15,5 @@
  *)
 
 (** Text console input/output operations. *)
-include S.CONSOLE
+include V1_LWT.CONSOLE
+val connect : string -> t Lwt.t

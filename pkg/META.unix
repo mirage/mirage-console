@@ -1,0 +1,7 @@
+description = "Console implementation for Unix"
+version = "%%VERSION_NUM%%"
+requires = "lwt mirage-types.lwt result cstruct.lwt"
+archive(byte) = "mirage-console-unix.cma"
+archive(native) = "mirage-console-unix.cmxa"
+plugin(byte) = "mirage-console-unix.cma"
+plugin(native) = "mirage-console-unix.cmxs"

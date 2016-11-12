@@ -1,0 +1,8 @@
+description = "Console implementation for Xen"
+version = "%%VERSION_NUM%%"
+requires =
+"lwt mirage-types mirage-xen io-page xen-gnt xen-evtchn mirage-console-xen-proto"
+archive(byte)   = "mirage-console-xen.cma"
+archive(native) = "mirage-console-xen.cmxa"
+plugin(byte)    = "mirage-console-xen.cma"
+plugin(native)  = "mirage-console-xen.cmxs"

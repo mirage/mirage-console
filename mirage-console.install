@@ -1,3 +1,0 @@
-bin: [
-  "?_build/cli/main.native" {"mirage-console-cli"}
-]
