@@ -25,11 +25,12 @@ type t = {
 }
 
 type 'a io = 'a Lwt.t
-type error = [ `Invalid_console of string ]
 type buffer = Cstruct.t
 
-let error_message (`Invalid_console msg) =
-  Printf.sprintf "Invalid console '%s'" msg
+(* NEEDED until we change FLOW *)
+let error_message e =
+  M_util.pp_console_error Format.str_formatter e ;
+  Format.flush_str_formatter ()
 
 let connect id =
   let read_buffer = Cstruct.create 1024 in
@@ -45,7 +46,7 @@ let read t =
   >|= fun n ->
   if n = 0 || t.closed then `Eof else `Ok (Cstruct.sub t.read_buffer 0 n)
 
-let write_one _t buf =
+let write_one buf =
   Lwt_cstruct.complete
     (fun frag ->
        let open Cstruct in
@@ -55,23 +56,22 @@ let write_one _t buf =
 let write t buf =
   if t.closed then Lwt.return `Eof
   else
-    write_one t buf >|= fun () ->
+    write_one buf >|= fun () ->
     `Ok ()
 
 let writev t bufs =
   if t.closed then Lwt.return `Eof
   else
-    Lwt_list.iter_s (write_one t) bufs >|= fun () ->
+    Lwt_list.iter_s write_one bufs >|= fun () ->
     `Ok ()
 
 let close t =
   t.closed <- true;
   Lwt.return ()
 
-let log _t s = prerr_endline s
+let log t s =
+  if t.closed then
+    Lwt.return_unit
+  else
+    write_one (Cstruct.of_string (s ^ "\n"))
 
-let log_s t s =
-  let s = s ^ "\n" in
-  let buf = Cstruct.create (String.length s) in
-  Cstruct.blit_from_string s 0 buf 0 (String.length s);
-  write_one t buf

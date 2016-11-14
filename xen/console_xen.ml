@@ -29,8 +29,7 @@ type t = {
 
 type 'a io = 'a Lwt.t
 
-type error = [ `Invalid_console of string ]
-
+(* NEEDED until we change FLOW *)
 let error_message (`Invalid_console msg) =
   Printf.sprintf "Invalid console '%s'" msg
 
@@ -170,8 +169,8 @@ let connect id =
       Xs.(wait xs (fun h ->
         enumerate h >>= fun all ->
         names_to_ids all >>= fun list ->
-        if List.mem_assoc id list
-        then Lwt.return (List.assoc id list, list)
+        if List.mem_assoc id list then
+          Lwt.return (List.assoc id list, list)
         else begin
           if not !printed_message then begin
             printed_message := true;
@@ -196,8 +195,8 @@ type buffer = Cstruct.t
 
 let write_one t buf =
   let rec loop after buffer =
-    if Cstruct.len buffer = 0
-    then Lwt.return_unit
+    if Cstruct.len buffer = 0 then
+      Lwt.return_unit
     else begin
       let seq, avail = Console_ring.Ring.Front.Writer.write t.ring in
       if Cstruct.len avail = 0 then begin
@@ -215,15 +214,15 @@ let write_one t buf =
   loop Activations.program_start buf
 
 let write t buf =
-  if t.closed
-  then Lwt.return `Eof
+  if t.closed then
+    Lwt.return `Eof
   else
     write_one t buf >|= fun () ->
     `Ok ()
 
 let writev t bufs =
-  if t.closed
-  then Lwt.return `Eof
+  if t.closed then
+    Lwt.return `Eof
   else
     Lwt_list.iter_s (write_one t) bufs >|= fun () ->
     `Ok ()
@@ -249,15 +248,7 @@ let close t =
   Lwt.return ()
 
 let log t s =
-  let s = s ^ "\r\n" in
-  let seq, avail = Console_ring.Ring.Front.Writer.write t.ring in
-  let n = min (String.length s) (Cstruct.len avail) in
-  Cstruct.blit_from_string s 0 avail 0 n;
-  Console_ring.Ring.Front.Writer.advance t.ring Int32.(add seq (of_int n));
-  Eventchn.notify h t.evtchn
-
-let log_s t s =
-  let s = s ^ "\r\n" in
-  let buf = Cstruct.create (String.length s) in
-  Cstruct.blit_from_string s 0 buf 0 (String.length s);
-  write_one t buf
+  if t.closed then
+    Lwt.return_unit
+  else
+    write_one t (Cstruct.of_string (s ^ "\r\n"))
