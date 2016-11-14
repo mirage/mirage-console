@@ -15,5 +15,6 @@ depends: [
   "ocamlbuild" {build}
   "topkg"      {build & >= "0.7.3"}
   "mirage-console-xen-proto"
+  "mirage-types-lwt"
   "xen-evtchn" "xen-gnt" "mirage-xen"
 ]
