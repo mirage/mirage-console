@@ -1,7 +1,7 @@
 description = "Console implementation for Xen"
 version = "%%VERSION_NUM%%"
 requires =
-"lwt mirage-types mirage-xen io-page xen-gnt xen-evtchn mirage-console-xen-proto"
+"lwt mirage-types mirage-xen io-page xen-gnt xen-evtchn mirage-console-xen-proto mirage-types.runtime"
 archive(byte)   = "mirage-console-xen.cma"
 archive(native) = "mirage-console-xen.cmxa"
 plugin(byte)    = "mirage-console-xen.cma"
