@@ -5,14 +5,14 @@ true: warn_error(+1..49), warn(A-4-41-44)
 
 <unix>: include
 
-<unix/*>: package(mirage-types.lwt lwt result cstruct mirage-types.runtime)
+<unix/*>: package(mirage-types.lwt lwt result cstruct)
 <lib_test/*>: package(mirage-types lwt cstruct.lwt cstruct)
 
 ## Xen
 
 <xen/*>: \
   package(lwt mirage-types.lwt mirage-xen xen-gnt xen-evtchn), \
-  package(mirage-console-xen-proto io-page mirage-types.runtime)
+  package(mirage-console-xen-proto io-page)
 
 <xen/proto/*>: package(xenstore result rresult)
 
