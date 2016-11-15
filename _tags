@@ -25,4 +25,4 @@ true: warn_error(+1..49), warn(A-4-41-44)
   package(xen-evtchn.unix.activations cmdliner xenstore xenstore_transport), \
   package(result cstruct.lwt rresult shared-memory-ring.console xen-gnt), \
   package(xenstore_transport.lwt xen-gnt.unix mirage-console-xen-backend), \
-  package(mirage-console-unix)
+  package(mirage-types.lwt mirage-console-unix)
