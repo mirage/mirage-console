@@ -29,7 +29,7 @@ type buffer = Cstruct.t
 
 (* NEEDED until we change FLOW *)
 let error_message e =
-  M_util.pp_console_error Format.str_formatter e ;
+  Mirage_pp.pp_console_error Format.str_formatter e ;
   Format.flush_str_formatter ()
 
 let connect id =
