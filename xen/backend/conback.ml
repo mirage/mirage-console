@@ -63,17 +63,24 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
 
   let service_thread t c stats =
 
+    let (>>!=) m f =
+      m >>= function
+      | Ok x -> f x
+      | Error `Closed -> Lwt.fail (Failure "End of file")
+      | Error (`Msg x) ->
+        Lwt.fail (Failure (Printf.sprintf "Invalid_console %s" x)) in
+
     let (>>|=) m f =
       m >>= function
-      | `Ok x -> f x
-      | `Eof -> Lwt.fail (Failure "End of file")
-      | `Error (`Invalid_console x) ->
+      | Ok (`Data x) -> f x
+      | Ok `Eof -> Lwt.fail (Failure "End of file")
+      | Error (`Msg x) ->
         Lwt.fail (Failure (Printf.sprintf "Invalid_console %s" x)) in
 
     let rec read_the_ring after =
       let open Lwt in
       let seq, avail = Console_ring.Ring.Front.Reader.read t.ring in
-      C.write c avail >>|= fun () ->
+      C.write c avail >>!= fun () ->
       let n = Cstruct.len avail in
       stats.total_read <- stats.total_read + n;
       let seq = Int32.(add seq (of_int n)) in
