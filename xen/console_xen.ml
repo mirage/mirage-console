@@ -29,11 +29,6 @@ type t = {
 
 type 'a io = 'a Lwt.t
 
-(* NEEDED until we change FLOW *)
-let error_message e =
-  Mirage_pp.pp_console_error Format.str_formatter e ;
-  Format.flush_str_formatter ()
-
 let h = Eventchn.init ()
 
 (* There are 2 console setup protocols in use. For the first console (index 0)
@@ -216,17 +211,17 @@ let write_one t buf =
 
 let write t buf =
   if t.closed then
-    Lwt.return `Eof
+    Lwt.return (Error `Closed)
   else
     write_one t buf >|= fun () ->
-    `Ok ()
+    Ok ()
 
 let writev t bufs =
   if t.closed then
-    Lwt.return `Eof
+    Lwt.return (Error `Closed)
   else
     Lwt_list.iter_s (write_one t) bufs >|= fun () ->
-    `Ok ()
+    Ok ()
 
 let read t =
   let rec wait_for_data after =
@@ -242,7 +237,7 @@ let read t =
       Lwt.return copy
     end in
   wait_for_data Activations.program_start >|= fun buf ->
-  if Cstruct.len buf = 0 then `Eof else `Ok buf
+  if Cstruct.len buf = 0 then (Ok `Eof) else Ok (`Data buf)
 
 let close t =
   t.closed <- true;

@@ -27,11 +27,6 @@ type t = {
 type 'a io = 'a Lwt.t
 type buffer = Cstruct.t
 
-(* NEEDED until we change FLOW *)
-let error_message e =
-  Mirage_pp.pp_console_error Format.str_formatter e ;
-  Format.flush_str_formatter ()
-
 let connect id =
   let read_buffer = Cstruct.create 1024 in
   let closed = false in
@@ -44,7 +39,7 @@ let read t =
   Lwt_bytes.read
     Lwt_unix.stdin t.read_buffer.Cstruct.buffer 0 (Cstruct.len t.read_buffer)
   >|= fun n ->
-  if n = 0 || t.closed then `Eof else `Ok (Cstruct.sub t.read_buffer 0 n)
+  if n = 0 || t.closed then (Ok `Eof) else Ok (`Data (Cstruct.sub t.read_buffer 0 n))
 
 let write_one buf =
   Lwt_cstruct.complete
@@ -54,16 +49,15 @@ let write_one buf =
     ) buf
 
 let write t buf =
-  if t.closed then Lwt.return `Eof
+  if t.closed then Lwt.return (Error `Closed)
   else
-    write_one buf >|= fun () ->
-    `Ok ()
+    write_one buf >|= fun () -> Ok ()
 
 let writev t bufs =
-  if t.closed then Lwt.return `Eof
+  if t.closed then Lwt.return (Error `Closed)
   else
     Lwt_list.iter_s write_one bufs >|= fun () ->
-    `Ok ()
+    Ok ()
 
 let close t =
   t.closed <- true;
