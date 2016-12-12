@@ -27,6 +27,12 @@ type t = {
 type 'a io = 'a Lwt.t
 type buffer = Cstruct.t
 
+type error = V1.Flow.error
+type write_error = V1.Flow.write_error
+
+let pp_error = Mirage_pp.pp_flow_error
+let pp_write_error = Mirage_pp.pp_flow_write_error
+
 let connect id =
   let read_buffer = Cstruct.create 1024 in
   let closed = false in
