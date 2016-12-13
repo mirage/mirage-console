@@ -5,20 +5,20 @@ true: warn_error(+1..49), warn(A-4-41-44)
 
 <unix>: include
 
-<unix/*>: package(mirage-types.lwt lwt result cstruct)
+<unix/*>: package(mirage-types-lwt lwt result cstruct)
 <lib_test/*>: package(mirage-types lwt cstruct.lwt cstruct)
 
 ## Xen
 
 <xen/*>: \
-  package(lwt mirage-types.lwt mirage-xen xen-gnt xen-evtchn), \
+  package(lwt mirage-types-lwt mirage-xen xen-gnt xen-evtchn), \
   package(mirage-console-xen-proto io-page)
 
 <xen/proto/*>: package(xenstore result rresult)
 
 <xen/backend/*>: \
   package(lwt xenstore xen-gnt xen-evtchn shared-memory-ring), \
-  package(shared-memory-ring.console mirage-types.lwt result), \
+  package(shared-memory-ring.console mirage-types-lwt result), \
   package(mirage-console-xen-proto)
 
 <xen/cli/*>: -safe_string, \
