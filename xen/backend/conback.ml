@@ -66,17 +66,14 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
     let (>>!=) m f =
       m >>= function
       | Ok x -> f x
-      | Error `Closed -> Lwt.fail (Failure "End of file")
-      | Error (`Msg x) ->
-        Lwt.fail (Failure (Printf.sprintf "Invalid_console %s" x)) in
-
+      | Error e -> Lwt.fail (Failure (Format.asprintf "%a" C.pp_write_error e))
+    in
     let (>>|=) m f =
       m >>= function
       | Ok (`Data x) -> f x
       | Ok `Eof -> Lwt.fail (Failure "End of file")
-      | Error (`Msg x) ->
-        Lwt.fail (Failure (Printf.sprintf "Invalid_console %s" x)) in
-
+      | Error e -> Lwt.fail (Failure (Format.asprintf "%a" C.pp_error e))
+    in
     let rec read_the_ring after =
       let open Lwt in
       let seq, avail = Console_ring.Ring.Front.Reader.read t.ring in
