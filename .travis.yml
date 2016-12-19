@@ -6,7 +6,7 @@ env:
   global:
   - EXTRA_REMOTES="https://github.com/mirage/mirage-dev.git"
   matrix:
-  - OCAML_VERSION=4.02 PACKAGE="mirage-console-unix"
-  - OCAML_VERSION=4.02 PACKAGE="mirage-console-xen"
   - OCAML_VERSION=4.03 PACKAGE="mirage-console-xen-cli"
   - OCAML_VERSION=4.03 PACKAGE="mirage-console-xen-backend"
+  - OCAML_VERSION=4.04 PACKAGE="mirage-console-unix"
+  - OCAML_VERSION=4.04 PACKAGE="mirage-console-xen"
