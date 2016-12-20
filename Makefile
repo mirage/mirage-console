@@ -1,5 +1,9 @@
 .PHONY: unix xen-proto xen-cli xen-backend xen
 
+sigs:
+	ocaml pkg/pkg.ml build -n mirage-console -q
+	ocaml pkg/pkg.ml build -n mirage-console-lwt -q
+
 unix:
 	ocaml pkg/pkg.ml build --pkg-name mirage-console-unix
 
@@ -19,4 +23,5 @@ xen:
 	ocaml pkg/pkg.ml build --pkg-name mirage-console-xen
 
 clean:
-	rm -rf _build
+	ocaml pkg/pkg.ml clean
+	rm -f *.install

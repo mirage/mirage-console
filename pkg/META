@@ -1,0 +1,3 @@
+description = "Console signature for MirageOS"
+version = "%%VERSION_NUM%%"
+requires = "mirage-device mirage-flow"

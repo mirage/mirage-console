@@ -1,24 +1,27 @@
 true : bin_annot, safe_string, package(bytes)
 true: warn_error(+1..49), warn(A-4-41-44)
 
+## Sigs
+
+<src/*>: package(mirage-flow mirage-device)
+<lwt/*>: package(mirage-console lwt cstruct)
+
 ## Unix
 
-<unix>: include
-
-<unix/*>: package(mirage-types-lwt lwt result cstruct)
-<lib_test/*>: package(mirage-types lwt cstruct.lwt cstruct)
+<unix/*>: package(mirage-console-lwt lwt result cstruct)
+<lib_test/*>: package(mirage-console-lwt lwt cstruct.lwt cstruct)
 
 ## Xen
 
 <xen/*>: \
-  package(lwt mirage-types-lwt mirage-xen xen-gnt xen-evtchn), \
+  package(lwt mirage-console-lwt mirage-xen xen-gnt xen-evtchn), \
   package(mirage-console-xen-proto io-page)
 
 <xen/proto/*>: package(xenstore result rresult)
 
 <xen/backend/*>: \
   package(lwt xenstore xen-gnt xen-evtchn shared-memory-ring), \
-  package(shared-memory-ring.console mirage-types-lwt result), \
+  package(shared-memory-ring.console mirage-console-lwt result), \
   package(mirage-console-xen-proto)
 
 <xen/cli/*>: -safe_string, \
