@@ -41,7 +41,7 @@ type stats = {
 }
 
 module type CONSOLE = sig
-  include V1_LWT.CONSOLE
+  include Mirage_console_lwt.S
   val connect: string -> t Lwt.t
 end
 
