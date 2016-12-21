@@ -14,6 +14,6 @@ depends: [
   "ocamlfind"  {build}
   "ocamlbuild" {build}
   "topkg"      {build & >= "0.7.3"}
-  "mirage-console"
+  "mirage-console" {>= "2.2.0"}
   "lwt" "cstruct"
 ]
