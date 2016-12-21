@@ -14,7 +14,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-open V1
 open Lwt.Infix
 
 (* TODO everything connects to the same console for now *)
@@ -30,8 +29,8 @@ type buffer = Cstruct.t
 
 type error
 let pp_error ppf _ = Fmt.string ppf "Console.error"
-type write_error = Flow.write_error
-let pp_write_error = Mirage_pp.write_error
+type write_error = Mirage_flow.write_error
+let pp_write_error = Mirage_flow.pp_write_error
 
 let connect id =
   let read_buffer = Cstruct.create 1024 in

@@ -15,5 +15,5 @@
  *)
 
 (** Text console input/output operations. *)
-include V1_LWT.CONSOLE
+include Mirage_console_lwt.S
 val connect : string -> t Lwt.t

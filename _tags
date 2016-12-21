@@ -8,6 +8,7 @@ true: warn_error(+1..49), warn(A-4-41-44)
 
 ## Unix
 
+<unix>: include
 <unix/*>: package(mirage-console-lwt lwt result cstruct)
 <lib_test/*>: package(mirage-console-lwt lwt cstruct.lwt cstruct)
 
