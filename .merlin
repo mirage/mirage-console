@@ -1,6 +1,6 @@
-PKG rresult xenstore result lwt mirage-types-lwt mirage-types
+PKG rresult xenstore result lwt mirage-device-lwt mirage-device
 PKG xen-gnt xen-evtchn shared-memory-ring xenstore_transport.lwt
-PKG xen-evtchn.unix.activations cmdliner mirage-runtime
+PKG xen-evtchn.unix.activations cmdliner
 PKG mirage-flow mirage-device
 S proto
 S unix
