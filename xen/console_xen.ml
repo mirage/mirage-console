@@ -27,6 +27,12 @@ type t = {
   mutable closed: bool;
 }
 
+type error
+let pp_error _ (_:error) = assert false
+
+type write_error = Mirage_flow.write_error
+let pp_write_error = Mirage_flow.pp_write_error
+
 type 'a io = 'a Lwt.t
 
 let h = Eventchn.init ()
