@@ -15,6 +15,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
+(** Console signature for MirageOS *)
+
 (** Console signature. *)
 module type S = sig
   include Mirage_device.S
