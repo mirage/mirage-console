@@ -1,1 +1,1 @@
-module C : V1.CONSOLE
+module C : Mirage_console.S

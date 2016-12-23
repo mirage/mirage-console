@@ -55,27 +55,25 @@ type t = {
 }
 
 module type CONSOLE = sig
-  include V1_LWT.CONSOLE
+  include Mirage_console_lwt.S
   val connect: string -> t Lwt.t
 end
 
 module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
 
+  let (>>!=) m f =
+    m >>= function
+    | Ok x -> f x
+    | Error `Closed -> Lwt.fail (Failure "End of file")
+    | Error e -> Fmt.kstrf Lwt.fail_with "Invalid_console %a" C.pp_write_error e
+
+  let (>>|=) m f =
+    m >>= function
+    | Ok (`Data x) -> f x
+    | Ok `Eof -> Lwt.fail (Failure "End of file")
+    | Error e -> Fmt.kstrf Lwt.fail_with "Invalid_console %a" C.pp_error e
+
   let service_thread t c stats =
-
-    let (>>!=) m f =
-      m >>= function
-      | Ok x -> f x
-      | Error `Closed -> Lwt.fail (Failure "End of file")
-      | Error (`Msg x) ->
-        Lwt.fail (Failure (Printf.sprintf "Invalid_console %s" x)) in
-
-    let (>>|=) m f =
-      m >>= function
-      | Ok (`Data x) -> f x
-      | Ok `Eof -> Lwt.fail (Failure "End of file")
-      | Error (`Msg x) ->
-        Lwt.fail (Failure (Printf.sprintf "Invalid_console %s" x)) in
 
     let rec read_the_ring after =
       let open Lwt in

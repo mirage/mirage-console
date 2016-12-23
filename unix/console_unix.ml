@@ -27,6 +27,11 @@ type t = {
 type 'a io = 'a Lwt.t
 type buffer = Cstruct.t
 
+type error
+let pp_error ppf _ = Fmt.string ppf "Console.error"
+type write_error = Mirage_flow.write_error
+let pp_write_error = Mirage_flow.pp_write_error
+
 let connect id =
   let read_buffer = Cstruct.create 1024 in
   let closed = false in
@@ -68,4 +73,3 @@ let log t s =
     Lwt.return_unit
   else
     write_one (Cstruct.of_string (s ^ "\n"))
-

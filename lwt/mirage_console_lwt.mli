@@ -1,5 +1,6 @@
 (*
- * Copyright (c) 2010-2013 Anil Madhavapeddy <anil@recoil.org>
+ * Copyright (c) 2011-present Anil Madhavapeddy <anil@recoil.org>
+ * Copyright (c) 2013-present Thomas Gazagnaire <thomas@gazagnaire.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,6 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-(** Text console input/output operations. *)
-include Mirage_console_lwt.S
-val connect : string -> t Lwt.t
+module type S = Mirage_console.S
+  with type 'a io = 'a Lwt.t
+   and type buffer = Cstruct.t
