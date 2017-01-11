@@ -16,7 +16,7 @@ module RingInfo: sig
   val to_string: t -> string
   val keys: string list
   val to_assoc_list: t -> (string * string) list
-  val of_assoc_list: (string * string) list -> (t, string) Result.result
+  val of_assoc_list: (string * string) list -> (t, string) result
 end
 
 module State: sig
@@ -26,7 +26,7 @@ module State: sig
   val _state: string
   val keys: string list
   val to_assoc_list: t -> (string * string) list
-  val of_assoc_list: (string * string) list -> (t, string) Result.result
+  val of_assoc_list: (string * string) list -> (t, string) result
 end
 
 module Connection: sig

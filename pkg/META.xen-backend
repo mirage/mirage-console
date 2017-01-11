@@ -1,7 +1,7 @@
 description = "Backend implementation for the Xen console protocol"
 version = "%%VERSION_NUM%%"
 requires =
-"lwt xenstore mirage-console-xen-proto xen-gnt xen-evtchn shared-memory-ring shared-memory-ring.console mirage-console-lwt result"
+"lwt xenstore mirage-console-xen-proto xen-gnt xen-evtchn shared-memory-ring shared-memory-ring.console mirage-console-lwt"
 archive(byte)   = "mirage-console-xen-backend.cma"
 archive(native) = "mirage-console-xen-backend.cmxa"
 plugin(byte)    = "mirage-console-xen-backend.cma"
