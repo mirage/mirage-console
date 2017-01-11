@@ -9,7 +9,7 @@ true: warn_error(+1..49), warn(A-4-41-44)
 ## Unix
 
 <unix>: include
-<unix/*>: package(mirage-console-lwt lwt result cstruct)
+<unix/*>: package(mirage-console-lwt lwt cstruct)
 <lib_test/*>: package(mirage-console-lwt lwt cstruct.lwt cstruct)
 
 ## Xen
@@ -18,15 +18,15 @@ true: warn_error(+1..49), warn(A-4-41-44)
   package(lwt mirage-console-lwt mirage-xen xen-gnt xen-evtchn), \
   package(mirage-console-xen-proto io-page)
 
-<xen/proto/*>: package(xenstore result rresult)
+<xen/proto/*>: package(xenstore rresult)
 
 <xen/backend/*>: \
   package(lwt xenstore xen-gnt xen-evtchn shared-memory-ring), \
-  package(shared-memory-ring.console mirage-console-lwt result), \
+  package(shared-memory-ring.console mirage-console-lwt), \
   package(mirage-console-xen-proto)
 
 <xen/cli/*>: -safe_string, \
   package(xen-evtchn.unix.activations cmdliner xenstore xenstore_transport), \
-  package(result cstruct.lwt rresult shared-memory-ring.console xen-gnt), \
+  package(cstruct.lwt rresult shared-memory-ring.console xen-gnt), \
   package(xenstore_transport.lwt xen-gnt.unix mirage-console-xen-backend), \
   package(mirage-console-unix)
