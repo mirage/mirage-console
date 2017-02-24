@@ -4,7 +4,6 @@ script: bash -ex .travis-opam.sh
 dist: trusty
 env:
   global:
-  - EXTRA_REMOTES="https://github.com/mirage/mirage-dev.git"
   matrix:
   - OCAML_VERSION=4.03 PACKAGE="mirage-console-xen-cli"
   - OCAML_VERSION=4.03 PACKAGE="mirage-console-xen-backend"
