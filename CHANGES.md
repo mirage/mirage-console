@@ -1,3 +1,7 @@
+### 2.2.1 (2017-05-24)
+
+* Link to `cstruct.lwt` explicitly rather than implicitly for the unix package.
+
 ### 2.2.0 (2016-12-21)
 
 * Import `V1.CONSOLE` from `mirage-types` into `Mirage_console.S` and create
