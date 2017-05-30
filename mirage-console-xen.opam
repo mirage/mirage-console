@@ -8,12 +8,14 @@ authors:       [ "Anil Madhavapeddy" "David Scott"]
 tags:          [ "org:mirage" "org:xapi-project"]
 license:       "ISC"
 
-build: ["ocaml" "pkg/pkg.ml" "build" "--pkg-name" name "--pinned" "%{pinned}%"]
+build: [
+  [ "jbuilder" "subst"] {pinned}
+  [ "jbuilder" "build" "-p" name "-j" jobs ]
+]
 
 depends: [
   "ocamlfind" {build}
-  "ocamlbuild" {build}
-  "topkg" {build & >= "0.8.0"}
+  "jbuilder"  {build & >="1.0+beta9"}
   "mirage-console-lwt" {>= "2.2.0"}
   "mirage-console-xen-proto"
   "xen-evtchn"
