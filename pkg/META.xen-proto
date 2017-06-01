@@ -1,7 +1,0 @@
-description = "Implementation of the Xen console protocol implementation"
-version = "%%VERSION_NUM%%"
-requires = "xenstore rresult mirage-console-lwt"
-archive(byte)   = "mirage-console-xen-proto.cma"
-archive(native) = "mirage-console-xen-proto.cmxa"
-plugin(byte)    = "mirage-console-xen-proto.cma"
-plugin(native)  = "mirage-console-xen-proto.cmxs"

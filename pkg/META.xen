@@ -1,8 +1,0 @@
-description = "Console implementation for Xen"
-version = "%%VERSION_NUM%%"
-requires =
-"lwt mirage-xen io-page xen-gnt xen-evtchn mirage-console-xen-proto mirage-console-lwt"
-archive(byte)   = "mirage-console-xen.cma"
-archive(native) = "mirage-console-xen.cmxa"
-plugin(byte)    = "mirage-console-xen.cma"
-plugin(native)  = "mirage-console-xen.cmxs"

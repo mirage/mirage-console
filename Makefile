@@ -1,27 +1,17 @@
-.PHONY: unix xen-proto xen-cli xen-backend xen
 
-sigs:
-	ocaml pkg/pkg.ml build -n mirage-console -q
-	ocaml pkg/pkg.ml build -n mirage-console-lwt -q
+.PHONY: build clean test
 
-unix:
-	ocaml pkg/pkg.ml build --pkg-name mirage-console-unix
+build:
+	jbuilder build @install --dev
 
-test: unix
-	ocaml pkg/pkg.ml test
+test:
+	jbuilder runtest --dev
 
-xen-proto:
-	ocaml pkg/pkg.ml build --pkg-name mirage-console-xen-proto
+install:
+	jbuilder install
 
-xen-cli:
-	ocaml pkg/pkg.ml build --pkg-name mirage-console-xen-cli
-
-xen-backend:
-	ocaml pkg/pkg.ml build --pkg-name mirage-console-xen-backend
-
-xen:
-	ocaml pkg/pkg.ml build --pkg-name mirage-console-xen
+uninstall:
+	jbuilder uninstall
 
 clean:
-	ocaml pkg/pkg.ml clean
-	rm -f *.install
+	rm -rf _build
