@@ -1,3 +1,8 @@
+### 2.3.0 (2017-06-01)
+
+* Build with jbuilder and release with topkg
+* Update to new shared-memory-ring-lwt dependency
+
 ### 2.2.1 (2017-05-24)
 
 * Link to `cstruct.lwt` explicitly rather than implicitly for the unix package.
