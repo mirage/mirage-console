@@ -1,3 +1,8 @@
+### 2.3.1 (2017-06-11)
+
+* Add missing xenstore.client to mirage-console-xen-backend
+* Add missing `Console_xen` to mirage-console-xen
+
 ### 2.3.0 (2017-06-01)
 
 * Build with jbuilder and release with topkg
