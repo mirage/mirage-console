@@ -1,4 +1,4 @@
-### 2.3.2 (2017-06-11)
+### 2.3.2 (2017-06-11)
 
 * Set `(wrapped false)` in mirage-console-xen
 
