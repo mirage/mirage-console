@@ -3,4 +3,5 @@
   (public_name mirage-console-xen)
   (libraries (lwt xenstore xen-gnt xen-evtchn shared-memory-ring
     mirage-console-xen-proto mirage-console-lwt mirage-flow mirage-xen))
+  (wrapped false)
 ))
