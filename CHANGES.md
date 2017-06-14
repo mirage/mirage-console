@@ -1,3 +1,11 @@
+v2.3.3 2017-06-14
+-----------------
+
+* Remove `mli` only modules in favour of `ml` ones instead.
+  This squelches some warnings from jbuilder and makes it safer
+  against future changes (if for example an exception is defined
+  in the mli file, it wont work).
+
 v2.3.2 2017-06-11
 -----------------
 
