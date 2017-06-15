@@ -1,5 +1,7 @@
-Pure OCaml implementations of Mirage consoles, for Unix and Xen
+## mirage-console -- implementations of Mirage consoles, for Unix and Xen
 
+%%VERSION%%
+ 
 The Unix version of the console currently uses standard output. The code is in
 
   unix/console.{ml,mli}
