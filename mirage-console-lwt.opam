@@ -14,7 +14,6 @@ build: [
 ]
 
 depends: [
-  "ocamlfind" {build}
   "jbuilder"  {build & >="1.0+beta9"}
   "mirage-console" {>= "2.2.0"}
   "lwt"
