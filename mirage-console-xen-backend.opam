@@ -18,6 +18,7 @@ depends: [
   "mirage-console-lwt" {>= "2.2.0"}
   "mirage-console-xen-proto"
   "lwt"
+  "io-page-xen" {>= "2.0.0"}
   "xenstore" "xen-evtchn" "xen-gnt" "shared-memory-ring-lwt"
 ]
 available: [ocaml-version >= "4.03.0"]

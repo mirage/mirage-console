@@ -136,7 +136,7 @@ let get_initial_console () =
   let backend_id = 0 in (* unused *)
   let gnt = Gnt.console in (* unused *)
   let page = Start_info.console_start_page () in
-  let ring = Io_page.to_cstruct page in
+  let ring = page in
   (* We don't need to zero the initial console ring, and doing so may lose boot
    * messages from Mini-OS. *)
 
