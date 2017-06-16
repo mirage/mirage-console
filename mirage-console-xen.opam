@@ -19,6 +19,7 @@ depends: [
   "mirage-console-xen-proto"
   "xen-evtchn"
   "xen-gnt"
+  "io-page-xen"
   "mirage-xen"
 ]
 available: [ocaml-version >= "4.03.0"]
