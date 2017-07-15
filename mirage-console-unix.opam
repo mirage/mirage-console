@@ -19,6 +19,5 @@ depends: [
   "cstruct" {>="3.0.0"}
   "cstruct-lwt"
   "mirage-console-lwt" {>= "2.2.0"}
-  "mirage-unix" {>="1.1.0"}
 ]
 available: [ocaml-version >= "4.03.0"]
