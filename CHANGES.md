@@ -1,7 +1,13 @@
-v2.4.4 2017-07-15
+v2.3.5 2017-07-15
 -----------------
 
 * Remove unnecessary dependency on mirage-unix from the packages.
+
+v2.3.4 2017-06-17
+-----------------
+
+* Depend on OCaml >= 4.03.0 and above
+* Add dependency on io-page-xen
 
 v2.3.3 2017-06-15
 -----------------

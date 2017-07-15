@@ -20,3 +20,4 @@ depends: [
   "cstruct" {>= "1.9.0"}
   "cstruct-lwt"
 ]
+available: [ocaml-version >= "4.03.0"]

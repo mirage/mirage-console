@@ -14,12 +14,12 @@ build: [
 ]
 
 depends: [
-  "ocamlfind" {build}
   "jbuilder"  {build & >="1.0+beta9"}
   "mirage-console-lwt" {>= "2.2.0"}
   "mirage-console-xen-proto"
   "xen-evtchn"
   "xen-gnt"
+  "io-page-xen"
   "mirage-xen"
 ]
 available: [ocaml-version >= "4.03.0"]
