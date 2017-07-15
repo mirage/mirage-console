@@ -1,3 +1,8 @@
+v2.4.4 2017-07-15
+-----------------
+
+* Remove unnecessary dependency on mirage-unix from the packages.
+
 v2.3.3 2017-06-15
 -----------------
 
