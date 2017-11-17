@@ -25,4 +25,4 @@ depends: [
   "xenstore_transport" "xenctrl" "xen-gnt"
   "mirage-console-xen-backend" "mirage-console-unix"
 ]
-available: [ocaml-version >= "4.03.0"]
+available: [ocaml-version >= "4.04.2"]

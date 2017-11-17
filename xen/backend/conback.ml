@@ -18,7 +18,6 @@
 open Lwt.Infix
 open Conproto
 open Gnt
-open Result
 
 module type ACTIVATIONS = sig
 

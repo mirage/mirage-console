@@ -18,7 +18,6 @@ let project_url = "http://github.com/mirage/mirage-console"
 
 open Lwt.Infix
 module Client = Xs_client_lwt.Client(Xs_transport_lwt_unix_client)
-open Result
 
 let backend_name =
   let sanitise x =

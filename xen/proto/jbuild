@@ -3,4 +3,4 @@
   (public_name mirage-console-xen-proto)
   (libraries (xenstore rresult))
   (wrapped false)
-))
+  (flags (:standard -safe-string))))

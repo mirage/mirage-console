@@ -21,4 +21,4 @@ depends: [
   "io-page-xen" {>= "2.0.0"}
   "xenstore" "xen-evtchn" "xen-gnt" "shared-memory-ring-lwt"
 ]
-available: [ocaml-version >= "4.03.0"]
+available: [ocaml-version >= "4.04.2"]

@@ -3,4 +3,4 @@
   (public_name mirage-console-lwt)
   (libraries (mirage-console lwt cstruct))
   (wrapped false)
-))
+  (flags (:standard -safe-string))))
