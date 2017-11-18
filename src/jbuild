@@ -3,5 +3,5 @@
   (public_name mirage-console)
   (libraries (mirage-flow mirage-device))
   (wrapped false)
-))
+  (flags (:standard -safe-string))))
 
