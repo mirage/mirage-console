@@ -6,8 +6,8 @@ env:
   global:
   - PINS="mirage-console:. mirage-console-xen:. mirage-console-unix:. mirage-console-xen-cli:. mirage-console-xen-backend:."
   matrix:
-  - OCAML_VERSION=4.06 PACKAGE="mirage-console"
-  - OCAML_VERSION=4.06 PACKAGE="mirage-console-lwt"
+  - OCAML_VERSION=4.07 PACKAGE="mirage-console"
+  - OCAML_VERSION=4.07 PACKAGE="mirage-console-lwt"
   - OCAML_VERSION=4.06 PACKAGE="mirage-console-unix"
   - OCAML_VERSION=4.05 PACKAGE="mirage-console-xen-cli"
   - OCAML_VERSION=4.05 PACKAGE="mirage-console-lwt"
