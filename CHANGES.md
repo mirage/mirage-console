@@ -4,6 +4,9 @@ v2.4.0 2019-02-03
 * Port build from jbuilder to Dune (@avsm)
 * Use non-deprecated cstruct dependencies (cstruct-lwt) (@avsm)
 * Upgrade opam metadata to 2.0 (@avsm)
+* Remove mirage-xen-console-cli from the distribution until the
+  upstream xenctrl library is more maintainable, since it doesnt
+  build on the last four recent versions of xen (@avsm)
 
 v2.3.5 2017-07-15
 -----------------
