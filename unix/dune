@@ -2,4 +2,5 @@
  (name mirage_console_unix)
  (public_name mirage-console-unix)
  (libraries mirage-console-lwt lwt cstruct-lwt cstruct)
- (flags :standard -safe-string))
+ (flags :standard -safe-string)
+ (wrapped false))
