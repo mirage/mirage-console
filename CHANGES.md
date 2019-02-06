@@ -1,3 +1,8 @@
+v2.4.1 2019-02-07
+-----------------
+
+* Fix mirage-console-unix package to be wrapped correctly (#73 @hannesm)
+
 v2.4.0 2019-02-03
 -----------------
 
