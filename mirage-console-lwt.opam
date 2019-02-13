@@ -12,7 +12,6 @@ depends: [
   "mirage-console" {>= "2.2.0"}
   "lwt"
   "cstruct" {>= "1.9.0"}
-  "cstruct-lwt"
 ]
 build: [
   ["dune" "subst"] {pinned}
