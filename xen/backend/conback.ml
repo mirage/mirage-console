@@ -17,7 +17,6 @@
 
 open Lwt.Infix
 open Conproto
-open Gnt
 
 module type ACTIVATIONS = sig
 
@@ -47,7 +46,6 @@ type stats = {
 
 type t = {
   domid:  int;
-  xg:     Gnttab.interface;
   xe:     Eventchn.handle;
   evtchn: Eventchn.t;
   ring:   Cstruct.t;
@@ -113,23 +111,22 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
     let (b: unit Lwt.t) = read_the_console A.program_start in
     Lwt.join [a; b]
 
-  let init xg xe domid ring_info c =
+  let init xe domid ring_info c =
     let evtchn =
       Eventchn.bind_interdomain xe domid ring_info.RingInfo.event_channel
     in
     let grant =
-      { Gnttab.domid = domid; ref = Int32.to_int ring_info.RingInfo.ref }
+      { OS.Xen.Import.domid = domid; ref = OS.Xen.Gntref.of_int32 ring_info.RingInfo.ref }
     in
-    match Gnttab.mapv xg [ grant ] true with
-    | None ->
-      failwith "Gnttab.mapv failed"
-    | Some mapping ->
-      let ring = Io_page.to_cstruct (Gnttab.Local_mapping.to_buf mapping) in
-      let t = { domid; xg; xe; evtchn; ring } in
+    match OS.Xen.Import.mapv [ grant ] ~writable:true with
+    | Error (`Msg s) -> failwith s
+    | Ok mapping ->
+      let ring = Io_page.to_cstruct (OS.Xen.Import.Local_mapping.to_buf mapping) in
+      let t = { domid; xe; evtchn; ring } in
       let stats = { total_read = 0; total_write = 0 } in
       let th = service_thread t c stats in
       Lwt.on_cancel th (fun () ->
-          let () = Gnttab.unmap_exn xg mapping in ()
+          let () = OS.Xen.Import.Local_mapping.unmap_exn mapping in ()
         );
       th, stats
 
@@ -200,7 +197,6 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
 
   let run (id: string) backend_name (domid,devid) =
     make () >>= fun client ->
-    let xg = Gnttab.interface_open () in
     let xe = Eventchn.init () in
 
     C.connect id >>= fun t ->
@@ -230,7 +226,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
          | Error x -> Lwt.fail (Failure x)) >>= fun ring_info ->
         Printf.printf "%s\n%!" (Conproto.RingInfo.to_string ring_info);
 
-        let be_thread, stats = init xg xe domid ring_info t in
+        let be_thread, stats = init xe domid ring_info t in
         writev client
           (List.map (fun (k, v) -> backend_path ^ "/" ^ k, v)
              (Conproto.State.to_assoc_list Conproto.State.Connected))

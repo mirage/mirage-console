@@ -16,12 +16,11 @@
 
 open Lwt.Infix
 open OS
-open Gnt
 
 type t = {
   id: int;
   backend_id: int;
-  gnt: Gnt.gntref;
+  gnt: Xen.Gntref.t;
   ring: Cstruct.t;
   mutable evtchn: Eventchn.t;
   mutable closed: bool;
@@ -47,11 +46,11 @@ let h = Eventchn.init ()
 
 (* Allocate a ring, given the vdev and backend domid *)
 let alloc (_, domid) =
-  let buf = Io_page.get 1 in
-  let ring = Io_page.to_cstruct buf in
+  let page = Io_page.get 1 in
+  let ring = Io_page.to_cstruct page in
   Console_ring.Ring.init ring; (* explicitly zero the ring *)
-  Gntshr.get () >|= fun gnt ->
-  Gntshr.grant_access ~domid ~writable:true gnt buf;
+  Xen.Export.get () >|= fun gnt ->
+  Xen.Export.grant_access ~domid ~writable:true gnt page ;
   gnt, ring
 
 (* Plug a console where id > 0 *)
@@ -78,7 +77,7 @@ let plug id =
   let evtchn = Eventchn.bind_unbound_port h backend_id in
   let port = Eventchn.to_int evtchn in
   let ring_info =
-    Conproto.RingInfo.({event_channel = port; ref = Int32.of_int gnt })
+    Conproto.RingInfo.({event_channel = port; ref = Xen.Gntref.to_int32 gnt })
   in
   let info = [
     "state", Device_state.(to_string Connected)
@@ -134,7 +133,7 @@ let get_initial_console () =
   (* The domain is created with a reserved grant entry already set up.
      We don't need to know who the backend domain is. *)
   let backend_id = 0 in (* unused *)
-  let gnt = Gnt.console in (* unused *)
+  let gnt = Xen.console in (* unused *)
   let page = Start_info.console_start_page () in
   let ring = page in
   (* We don't need to zero the initial console ring, and doing so may lose boot

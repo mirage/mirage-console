@@ -11,11 +11,11 @@ depends: [
   "dune" {build & >= "1.0"}
   "mirage-console-lwt" {>= "2.2.0"}
   "mirage-console-xen-proto"
+  "mirage-xen" {>= "3.3.0"}
   "lwt"
   "io-page-xen" {>= "2.0.0"}
   "xenstore"
   "xen-evtchn"
-  "xen-gnt"
   "shared-memory-ring-lwt"
 ]
 build: [
