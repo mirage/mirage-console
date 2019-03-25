@@ -132,8 +132,6 @@ let names_to_ids ids =
 let get_initial_console () =
   (* The domain is created with a reserved grant entry already set up.
      We don't need to know who the backend domain is. *)
-  let backend_id = 0 in (* unused *)
-  let gnt = Xen.console in (* unused *)
   let page = Start_info.console_start_page () in
   let ring = page in
   (* We don't need to zero the initial console ring, and doing so may lose boot
@@ -145,7 +143,7 @@ let get_initial_console () =
     e in
   let evtchn = get_evtchn () in
   let closed = false in
-  let cons = { id = 0; backend_id; gnt; ring; evtchn; closed  } in
+  let cons = { id = 0; backend_id = 0; gnt = Xen.console; ring; evtchn; closed  } in
   Sched.add_resume_hook (fun () -> cons.evtchn <- get_evtchn (); Lwt.return ());
 
   Eventchn.unmask h evtchn;
@@ -189,8 +187,12 @@ let connect id =
     end
   end
 
-let disconnect _id =
-  Lwt.return_unit
+let disconnect t =
+  (* attempting to unmap the preset page for the constant default console
+     is a bad idea, according to Xen Experts, so don't do that *)
+  match t.id with
+  | 0 -> Lwt.return_unit
+  | _ -> OS.Xen.Export.end_access ~release_ref:true t.gnt
 
 type buffer = Cstruct.t
 
