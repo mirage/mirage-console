@@ -1,3 +1,8 @@
+v2.4.2 2019-03-27
+-----------------
+
+* Use new grant API from mirage-xen instead of xen-gnt (#75 @yomimono)
+
 v2.4.1 2019-02-07
 -----------------
 
