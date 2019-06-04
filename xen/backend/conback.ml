@@ -18,6 +18,8 @@
 open Lwt.Infix
 open Conproto
 
+module OS = Os_xen
+
 module type ACTIVATIONS = sig
 
   (** Event channels handlers. *)

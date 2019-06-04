@@ -15,7 +15,7 @@
  *)
 
 open Lwt.Infix
-open OS
+open Os_xen
 
 type t = {
   id: int;
@@ -192,7 +192,7 @@ let disconnect t =
      is a bad idea, according to Xen Experts, so don't do that *)
   match t.id with
   | 0 -> Lwt.return_unit
-  | _ -> OS.Xen.Export.end_access ~release_ref:true t.gnt
+  | _ -> Xen.Export.end_access ~release_ref:true t.gnt
 
 type buffer = Cstruct.t
 
