@@ -1,3 +1,8 @@
+v2.4.3
+------
+
+* Use mirage-xen 4.0 `Os_xen` interface (#77 @TheLortex)
+
 v2.4.2 2019-03-27
 -----------------
 
