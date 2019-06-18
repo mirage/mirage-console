@@ -12,7 +12,7 @@ depends: [
   "lwt"
   "cstruct" {>= "3.0.0"}
   "cstruct-lwt"
-  "mirage-console-lwt" {>= "2.2.0"}
+  "mirage-console-lwt" {=version}
 ]
 build: [
   ["dune" "subst"] {pinned}

@@ -19,3 +19,8 @@ build: [
 ]
 dev-repo: "git+https://github.com/mirage/mirage-console.git"
 synopsis: "Implementation of Mirage console protocol for Xen"
+
+pin-depends: [
+  ["mirage-xen.dev" "git+https://github.com/mirage/mirage-xen"]
+]
+

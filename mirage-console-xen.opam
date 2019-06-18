@@ -9,11 +9,11 @@ bug-reports: "https://github.com/mirage/mirage-console/issues"
 depends: [
   "ocaml" {>= "4.04.2"}
   "dune" {build & >= "1.0"}
-  "mirage-console-lwt" {>= "2.2.0"}
-  "mirage-console-xen-proto"
+  "mirage-console-lwt" {=version}
+  "mirage-console-xen-proto" {=version}
   "xen-evtchn"
   "io-page-xen"
-  "mirage-xen" {>= "3.3.0"}
+  "mirage-xen" {>= "4.0.0"}
 ]
 build: [
   ["dune" "subst"] {pinned}
@@ -21,3 +21,8 @@ build: [
 ]
 dev-repo: "git+https://github.com/mirage/mirage-console.git"
 synopsis: "Implementation of Mirage console for Xen"
+
+pin-depends: [
+  ["mirage-xen.dev" "git+https://github.com/mirage/mirage-xen"]
+]
+
