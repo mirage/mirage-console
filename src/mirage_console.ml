@@ -21,11 +21,9 @@
 module type S = sig
   include Mirage_device.S
 
-  include Mirage_flow.S with
-      type 'a io  := 'a io
-  and type flow   := t
+  include Mirage_flow.S with type flow := t
 
-  val log: t -> string -> unit io
+  val log: t -> string -> unit Lwt.t
   (** [log t str] writes [str] to the console [t], appending appropriate line
       endings.  If {!close} was called on the console before, [str] is discarded
       silently.

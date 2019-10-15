@@ -4,14 +4,11 @@ script: bash -ex .travis-opam.sh
 dist: trusty
 env:
   global:
-  - PINS="mirage-console:. mirage-console-xen:. mirage-console-unix:. mirage-console-xen-backend:."
+  - PINS="mirage-console:. mirage-console-xen:. mirage-console-unix:. mirage-console-xen-backend:. mirage-device.2.0.0:git+https://github.com/hannesm/mirage-device.git#easy mirage-flow.2.0.0:git+https://github.com/hannesm/mirage-flow.git#easy"
   matrix:
-  - OCAML_VERSION=4.07 PACKAGE="mirage-console"
-  - OCAML_VERSION=4.07 PACKAGE="mirage-console-lwt"
-  - OCAML_VERSION=4.06 PACKAGE="mirage-console-unix"
-  - OCAML_VERSION=4.05 PACKAGE="mirage-console-xen"
-  - OCAML_VERSION=4.05 PACKAGE="mirage-console-lwt"
-  - OCAML_VERSION=4.05 PACKAGE="mirage-console-unix"
-  - OCAML_VERSION=4.04 PACKAGE="mirage-console-xen-proto"
-  - OCAML_VERSION=4.04 PACKAGE="mirage-console-xen-backend"
-  - OCAML_VERSION=4.04 PACKAGE="mirage-console-xen"
+  - OCAML_VERSION=4.06 PACKAGE="mirage-console"
+  - OCAML_VERSION=4.07 PACKAGE="mirage-console-xen-proto"
+  - OCAML_VERSION=4.07 PACKAGE="mirage-console-xen-backend"
+  - OCAML_VERSION=4.08 PACKAGE="mirage-console-xen"
+  - OCAML_VERSION=4.08 PACKAGE="mirage-console-unix"
+  - OCAML_VERSION=4.09 PACKAGE="mirage-console-unix"
