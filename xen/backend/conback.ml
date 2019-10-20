@@ -54,7 +54,7 @@ type t = {
 }
 
 module type CONSOLE = sig
-  include Mirage_console_lwt.S
+  include Mirage_console.S
   val connect: string -> t Lwt.t
 end
 
