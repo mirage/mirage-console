@@ -4,7 +4,7 @@ script: bash -ex .travis-opam.sh
 dist: trusty
 env:
   global:
-  - PINS="mirage-console.3.0.0:. mirage-console-xen.3.0.0:. mirage-console-unix.3.0.0:. mirage-console-xen-backend.3.0.0:. mirage-device.2.0.0:git+https://github.com/hannesm/mirage-device.git#easy mirage-flow.2.0.0:git+https://github.com/hannesm/mirage-flow.git#easy"
+  - PINS="mirage-console.3.0.0:. mirage-console-xen.3.0.0:. mirage-console-unix.3.0.0:. mirage-console-xen-proto.3.0.0:. mirage-console-xen-backend.3.0.0:. mirage-device.2.0.0:git+https://github.com/hannesm/mirage-device.git#easy mirage-flow.2.0.0:git+https://github.com/hannesm/mirage-flow.git#easy"
   matrix:
   - OCAML_VERSION=4.06 PACKAGE="mirage-console"
   - OCAML_VERSION=4.07 PACKAGE="mirage-console-xen-proto"
