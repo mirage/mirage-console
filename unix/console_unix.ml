@@ -19,24 +19,19 @@ open Lwt.Infix
 (* TODO everything connects to the same console for now *)
 (* TODO management service for logging *)
 type t = {
-  id: string;
   read_buffer: Cstruct.t;
   mutable closed: bool;
 }
-
-type 'a io = 'a Lwt.t
-type buffer = Cstruct.t
 
 type error
 let pp_error ppf _ = Fmt.string ppf "Console.error"
 type write_error = Mirage_flow.write_error
 let pp_write_error = Mirage_flow.pp_write_error
 
-let connect id =
+let connect _id =
   let read_buffer = Cstruct.create 1024 in
   let closed = false in
-  let t = { id; read_buffer; closed } in
-  Lwt.return t
+  Lwt.return { read_buffer; closed }
 
 let disconnect _t = Lwt.return_unit
 
