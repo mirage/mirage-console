@@ -1,3 +1,10 @@
+v3.0.0 2019-10-24
+-----------------
+
+* Retire mirage-console-lwt (#80 @hannesm)
+* Specialise mirage-console to Lwt.t and Cstruct.t directly (#80 @hannesm)
+* Raise lower OCaml bound to 4.06.0 (#80 @hannesm)
+
 v2.4.3 2019-06-26
 -----------------
 

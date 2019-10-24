@@ -1,10 +1,13 @@
 language: c
-install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-opam.sh
-script: bash -ex .travis-opam.sh
-dist: trusty
+install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-docker.sh
+script: bash -ex .travis-docker.sh
+sudo: false
+services:
+  - docker
 env:
   global:
-  - PINS="mirage-console.3.0.0:. mirage-console-xen.3.0.0:. mirage-console-unix.3.0.0:. mirage-console-xen-proto.3.0.0:. mirage-console-xen-backend.3.0.0:. mirage-device.2.0.0:git+https://github.com/hannesm/mirage-device.git#easy mirage-flow.2.0.0:git+https://github.com/hannesm/mirage-flow.git#easy"
+  - PINS="mirage-console.3.0.0:. mirage-console-xen.3.0.0:. mirage-console-unix.3.0.0:. mirage-console-xen-proto.3.0.0:. mirage-console-xen-backend.3.0.0:."
+  - DISTRO=alpine
   matrix:
   - OCAML_VERSION=4.06 PACKAGE="mirage-console"
   - OCAML_VERSION=4.07 PACKAGE="mirage-console-xen-proto"
