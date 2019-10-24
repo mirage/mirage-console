@@ -13,5 +13,4 @@ env:
   - OCAML_VERSION=4.07 PACKAGE="mirage-console-xen-proto"
   - OCAML_VERSION=4.07 PACKAGE="mirage-console-xen-backend"
   - OCAML_VERSION=4.08 PACKAGE="mirage-console-xen"
-  - OCAML_VERSION=4.08 PACKAGE="mirage-console-unix"
   - OCAML_VERSION=4.09 PACKAGE="mirage-console-unix"
