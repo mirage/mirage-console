@@ -32,8 +32,6 @@ let pp_error _ (_:error) = assert false
 type write_error = Mirage_flow.write_error
 let pp_write_error = Mirage_flow.pp_write_error
 
-type 'a io = 'a Lwt.t
-
 let h = Eventchn.init ()
 
 (* There are 2 console setup protocols in use. For the first console (index 0)
@@ -193,8 +191,6 @@ let disconnect t =
   match t.id with
   | 0 -> Lwt.return_unit
   | _ -> Xen.Export.end_access ~release_ref:true t.gnt
-
-type buffer = Cstruct.t
 
 let write_one t buf =
   let rec loop after buffer =
