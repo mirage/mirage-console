@@ -6,7 +6,7 @@ services:
   - docker
 env:
   global:
-  - PINS="mirage-console.3.0.0:. mirage-console-xen.3.0.0:. mirage-console-unix.3.0.0:. mirage-console-xen-proto.3.0.0:. mirage-console-xen-backend.3.0.0:."
+  - PINS="mirage-console:. mirage-console-xen:. mirage-console-unix:. mirage-console-xen-proto:. mirage-console-xen-backend:."
   - DISTRO=alpine
   matrix:
   - OCAML_VERSION=4.06 PACKAGE="mirage-console"
