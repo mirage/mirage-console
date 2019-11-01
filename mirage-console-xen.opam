@@ -13,7 +13,7 @@ depends: [
   "mirage-console-xen-proto" {=version}
   "xen-evtchn"
   "io-page-xen"
-  "mirage-xen" {>= "4.0.0"}
+  "mirage-xen" {>= "5.0.0"}
 ]
 build: [
   ["dune" "subst"] {pinned}

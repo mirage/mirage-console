@@ -15,7 +15,7 @@
  *)
 
 open Lwt.Infix
-open Os_xen
+open OS
 
 type t = {
   id: int;
