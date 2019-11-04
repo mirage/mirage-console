@@ -1,3 +1,8 @@
+v3.0.2 2019-11-04
+-----------------
+
+* provide deprecated Mirage_console_lwt for smooth transition (#83 @hannesm)
+
 v3.0.1 2019-11-01
 -----------------
 
