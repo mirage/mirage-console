@@ -136,7 +136,7 @@ let get_initial_console () =
    * messages from Mini-OS. *)
 
   let get_evtchn () =
-    let e = Eventchn.of_int Start_info.((get ()).console_evtchn) in
+    let e = Eventchn.of_int (Start_info.console_event_channel ()) in
     Eventchn.unmask h e;
     e in
   let evtchn = get_evtchn () in
