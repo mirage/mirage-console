@@ -127,23 +127,30 @@ let names_to_ids ids =
             Lwt.return list)
     ) [] ids
 
+type page = (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout)
+    Bigarray.Array1.t
+
+external mirage_xen_get_console_evtchn: unit -> int =
+    "mirage_xen_get_console_evtchn"
+external mirage_xen_get_console_page: unit -> page =
+    "mirage_xen_get_console_page"
+
+let get_console_evtchn () = Eventchn.of_int @@
+    mirage_xen_get_console_evtchn ()
+
+let get_console_page () = Cstruct.of_bigarray @@
+    mirage_xen_get_console_page ()
+
 let get_initial_console () =
   (* The domain is created with a reserved grant entry already set up.
      We don't need to know who the backend domain is. *)
-  let page = Start_info.console_start_page () in
+  let page = get_console_page () in
+  let evtchn = get_console_evtchn () in
   let ring = page in
-  (* We don't need to zero the initial console ring, and doing so may lose boot
-   * messages from Mini-OS. *)
-
-  let get_evtchn () =
-    let e = Eventchn.of_int Start_info.((get ()).console_evtchn) in
-    Eventchn.unmask h e;
-    e in
-  let evtchn = get_evtchn () in
+  (* We don't need to zero the initial console ring, doing so would lose
+   * initial messages from Solo5 / the OCaml runtime. *)
   let closed = false in
   let cons = { id = 0; backend_id = 0; gnt = Xen.console; ring; evtchn; closed  } in
-  Sched.add_resume_hook (fun () -> cons.evtchn <- get_evtchn (); Lwt.return ());
-
   Eventchn.unmask h evtchn;
   Eventchn.notify h evtchn;
   cons

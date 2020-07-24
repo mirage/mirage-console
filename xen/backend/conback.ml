@@ -28,7 +28,7 @@ module type ACTIVATIONS = sig
   val program_start: event
   (** represents an event which 'fired' when the program started *)
 
-  val after: Eventchn.t -> event -> event Lwt.t
+  val after: OS.Eventchn.t -> event -> event Lwt.t
   (** [next channel event] blocks until the system receives an event
       newer than [event] on channel [channel]. If an event is received
       while we aren't looking then this will be remembered and the
@@ -46,8 +46,8 @@ type stats = {
 
 type t = {
   domid:  int;
-  xe:     Eventchn.handle;
-  evtchn: Eventchn.t;
+  xe:     OS.Eventchn.handle;
+  evtchn: OS.Eventchn.t;
   ring:   Cstruct.t;
 }
 
@@ -80,7 +80,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
       stats.total_read <- stats.total_read + n;
       let seq = Int32.(add seq (of_int n)) in
       Console_ring.Ring.Front.Reader.advance t.ring seq;
-      Eventchn.notify t.xe t.evtchn;
+      OS.Eventchn.notify t.xe t.evtchn;
       A.after t.evtchn after >>= fun next ->
       read_the_ring next in
 
@@ -100,7 +100,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
             Cstruct.blit buffer 0 avail 0 n;
             let seq = Int32.(add seq (of_int n)) in
             Console_ring.Ring.Back.Writer.advance t.ring seq;
-            Eventchn.notify t.xe t.evtchn;
+            OS.Eventchn.notify t.xe t.evtchn;
             loop after (Cstruct.shift buffer n)
           end
         end in
@@ -113,7 +113,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
 
   let init xe domid ring_info c =
     let evtchn =
-      Eventchn.bind_interdomain xe domid ring_info.RingInfo.event_channel
+      OS.Eventchn.bind_interdomain xe domid ring_info.RingInfo.event_channel
     in
     let grant =
       { OS.Xen.Import.domid = domid; ref = OS.Xen.Gntref.of_int32 ring_info.RingInfo.ref }
@@ -197,7 +197,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
 
   let run (id: string) backend_name (domid,devid) =
     make () >>= fun client ->
-    let xe = Eventchn.init () in
+    let xe = OS.Eventchn.init () in
 
     C.connect id >>= fun t ->
     mk_backend_path client backend_name (domid,devid) >>= fun backend_path ->
