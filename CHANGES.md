@@ -1,3 +1,8 @@
+v4.0.0 2020-10-21
+-----------------
+
+* Adapt to mirage-xen 6.0.0 API changes (Solo5 based Xen PVH, #85 @mato)
+
 v3.0.2 2019-11-04
 -----------------
 
