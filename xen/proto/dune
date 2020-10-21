@@ -2,5 +2,4 @@
  (name mirage_console_xen_proto)
  (public_name mirage-console-xen-proto)
  (libraries xenstore rresult)
- (wrapped false)
- (flags :standard -safe-string))
+ (wrapped false))
