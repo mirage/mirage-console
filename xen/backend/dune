@@ -2,5 +2,4 @@
  (name mirage_console_xen_backend)
  (public_name mirage-console-xen-backend)
  (libraries lwt mirage-xen xenstore xenstore.client io-page
-   shared-memory-ring mirage-console mirage-console-xen-proto)
- (flags :standard -safe-string))
+   shared-memory-ring mirage-console mirage-console-xen-proto))

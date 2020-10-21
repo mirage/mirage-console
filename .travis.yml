@@ -9,8 +9,8 @@ env:
   - PINS="mirage-console:. mirage-console-xen:. mirage-console-unix:. mirage-console-xen-proto:. mirage-console-xen-backend:."
   - DISTRO=alpine
   matrix:
-  - OCAML_VERSION=4.06 PACKAGE="mirage-console"
-  - OCAML_VERSION=4.07 PACKAGE="mirage-console-xen-proto"
-  - OCAML_VERSION=4.07 PACKAGE="mirage-console-xen-backend"
-  - OCAML_VERSION=4.08 PACKAGE="mirage-console-xen"
-  - OCAML_VERSION=4.09 PACKAGE="mirage-console-unix"
+  - OCAML_VERSION=4.10 PACKAGE="mirage-console-unix"
+  - OCAML_VERSION=4.10 PACKAGE="mirage-console-xen"
+  - OCAML_VERSION=4.09 PACKAGE="mirage-console-xen-proto"
+  - OCAML_VERSION=4.09 PACKAGE="mirage-console-xen-backend"
+  - OCAML_VERSION=4.08 PACKAGE="mirage-console"
