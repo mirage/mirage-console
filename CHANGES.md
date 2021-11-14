@@ -1,10 +1,10 @@
-v5.0.0
-------
+v5.0.0 2021-11-15
+-----------------
 
-* Remove Mirage_console_lwt module
-* Remove mirage-device dependency
-* Remove rresult dependency
-* Update to fmt 0.8.7 and cstruct 6.0.0 API
+* Remove Mirage_console_lwt module (#86 @hannesm)
+* Remove mirage-device dependency (#86 @hannesm)
+* Remove rresult dependency (#86 @hannesm)
+* Update to fmt 0.8.7 and cstruct 6.0.0 API (#86 @hannesm)
 
 v4.0.0 2020-10-21
 -----------------
