@@ -37,7 +37,7 @@ let disconnect _t = Lwt.return_unit
 
 let read t =
   Lwt_bytes.read
-    Lwt_unix.stdin t.read_buffer.Cstruct.buffer 0 (Cstruct.len t.read_buffer)
+    Lwt_unix.stdin t.read_buffer.Cstruct.buffer 0 (Cstruct.length t.read_buffer)
   >|= fun n ->
   if n = 0 || t.closed then (Ok `Eof) else Ok (`Data (Cstruct.sub t.read_buffer 0 n))
 

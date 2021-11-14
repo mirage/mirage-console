@@ -12,13 +12,14 @@ depends: [
   "io-page" {>= "2.0.0"}
   "xenstore"
   "shared-memory-ring"
+  "lwt"
   "mirage-flow"
   "mirage-console" {=version}
   "mirage-console-xen-proto" {=version}
   "mirage-xen" {>= "6.0.0"}
 ]
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   ["dune" "build" "-p" name "-j" jobs]
 ]
 dev-repo: "git+https://github.com/mirage/mirage-console.git"
