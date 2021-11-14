@@ -19,7 +19,12 @@
 
 (** Console signature. *)
 module type S = sig
-  include Mirage_device.S
+  type t
+  (** The type representing the internal state of the console. *)
+
+  val disconnect: t -> unit Lwt.t
+  (** Disconnect from the console. While this might take some time to
+      complete, it can never result in an error. *)
 
   include Mirage_flow.S with type flow := t
 

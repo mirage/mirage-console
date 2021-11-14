@@ -201,15 +201,15 @@ let disconnect t =
 
 let write_one t buf =
   let rec loop after buffer =
-    if Cstruct.len buffer = 0 then
+    if Cstruct.length buffer = 0 then
       Lwt.return_unit
     else begin
       let seq, avail = Console_ring.Ring.Front.Writer.write t.ring in
-      if Cstruct.len avail = 0 then begin
+      if Cstruct.length avail = 0 then begin
         Activations.after t.evtchn after >>= fun next ->
         loop next buffer
       end else begin
-        let n = min (Cstruct.len avail) (Cstruct.len buffer) in
+        let n = min (Cstruct.length avail) (Cstruct.length buffer) in
         Cstruct.blit buffer 0 avail 0 n;
         let seq = Int32.(add seq (of_int n)) in
         Console_ring.Ring.Front.Writer.advance t.ring seq;
@@ -236,18 +236,18 @@ let writev t bufs =
 let read t =
   let rec wait_for_data after =
     let seq, avail = Console_ring.Ring.Front.Reader.read t.ring in
-    if Cstruct.len avail = 0 && not t.closed then begin
+    if Cstruct.length avail = 0 && not t.closed then begin
       Activations.after t.evtchn after >>= fun after ->
       wait_for_data after
     end else begin
-      let copy = Cstruct.create (Cstruct.len avail) in
-      Cstruct.blit avail 0 copy 0 (Cstruct.len avail);
-      Console_ring.Ring.Front.Reader.advance t.ring Int32.(add seq (of_int (Cstruct.len avail)));
+      let copy = Cstruct.create (Cstruct.length avail) in
+      Cstruct.blit avail 0 copy 0 (Cstruct.length avail);
+      Console_ring.Ring.Front.Reader.advance t.ring Int32.(add seq (of_int (Cstruct.length avail)));
       Eventchn.notify h t.evtchn;
       Lwt.return copy
     end in
   wait_for_data Activations.program_start >|= fun buf ->
-  if Cstruct.len buf = 0 then (Ok `Eof) else Ok (`Data buf)
+  if Cstruct.length buf = 0 then (Ok `Eof) else Ok (`Data buf)
 
 let close t =
   t.closed <- true;

@@ -62,13 +62,13 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
     m >>= function
     | Ok x -> f x
     | Error `Closed -> Lwt.fail (Failure "End of file")
-    | Error e -> Fmt.kstrf Lwt.fail_with "Invalid_console %a" C.pp_write_error e
+    | Error e -> Fmt.kstr Lwt.fail_with "Invalid_console %a" C.pp_write_error e
 
   let (>>|=) m f =
     m >>= function
     | Ok (`Data x) -> f x
     | Ok `Eof -> Lwt.fail (Failure "End of file")
-    | Error e -> Fmt.kstrf Lwt.fail_with "Invalid_console %a" C.pp_error e
+    | Error e -> Fmt.kstr Lwt.fail_with "Invalid_console %a" C.pp_error e
 
   let service_thread t c stats =
 
@@ -76,7 +76,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
       let open Lwt in
       let seq, avail = Console_ring.Ring.Front.Reader.read t.ring in
       C.write c avail >>!= fun () ->
-      let n = Cstruct.len avail in
+      let n = Cstruct.length avail in
       stats.total_read <- stats.total_read + n;
       let seq = Int32.(add seq (of_int n)) in
       Console_ring.Ring.Front.Reader.advance t.ring seq;
@@ -88,15 +88,15 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
       let open Lwt in
       C.read c >>|= fun buffer ->
       let rec loop after buffer =
-        if Cstruct.len buffer = 0
+        if Cstruct.length buffer = 0
         then return after
         else begin
           let seq, avail = Console_ring.Ring.Back.Writer.write t.ring in
-          if Cstruct.len avail = 0 then begin
+          if Cstruct.length avail = 0 then begin
             A.after t.evtchn after >>= fun next ->
             loop next buffer
           end else begin
-            let n = min (Cstruct.len avail) (Cstruct.len buffer) in
+            let n = min (Cstruct.length avail) (Cstruct.length buffer) in
             Cstruct.blit buffer 0 avail 0 n;
             let seq = Int32.(add seq (of_int n)) in
             Console_ring.Ring.Back.Writer.advance t.ring seq;

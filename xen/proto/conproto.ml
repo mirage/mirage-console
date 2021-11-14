@@ -1,5 +1,3 @@
-open Rresult
-
 let list l k =
   if not(List.mem_assoc k l)
   then Error (Printf.sprintf "missing %s key" k)
@@ -8,6 +6,8 @@ let list l k =
 let int x = try Ok (int_of_string x) with _ -> Error ("not an int: " ^ x)
 let int32 x = try Ok (Int32.of_string x) with _ -> Error ("not an int32: " ^ x)
 let _int64 x = try Ok (Int64.of_string x) with _ -> Error ("not an int64: " ^ x)
+
+let ( let* ) = Result.bind
 
 module Protocol = struct
   type t = Vt100
@@ -43,9 +43,15 @@ module RingInfo = struct
     ]
 
   let of_assoc_list l =
-    list l _ring_ref >>= fun x -> int32 x
-    >>= fun ref -> list l _port >>= fun x -> int x
-    >>= fun event_channel -> Ok { ref; event_channel }
+    let* ref =
+      let* x = list l _ring_ref in
+      int32 x
+    in
+    let* event_channel =
+      let* x = list l _port in
+      int x
+    in
+    Ok { ref; event_channel }
 end
 
 module State = struct
@@ -70,8 +76,8 @@ module State = struct
   let _state = "state"
   let keys = [ _state ]
   let of_assoc_list l =
-    list l _state >>= fun x ->
-    int x >>= fun x ->
+    let* x = list l _state in
+    let* x = int x in
     of_int x
   let to_assoc_list t = [
       _state, string_of_int (List.assoc t table')
