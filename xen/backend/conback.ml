@@ -28,7 +28,7 @@ module type ACTIVATIONS = sig
   val program_start: event
   (** represents an event which 'fired' when the program started *)
 
-  val after: OS.Eventchn.t -> event -> event Lwt.t
+  val after: Xen_os.Eventchn.t -> event -> event Lwt.t
   (** [next channel event] blocks until the system receives an event
       newer than [event] on channel [channel]. If an event is received
       while we aren't looking then this will be remembered and the
@@ -46,8 +46,8 @@ type stats = {
 
 type t = {
   domid:  int;
-  xe:     OS.Eventchn.handle;
-  evtchn: OS.Eventchn.t;
+  xe:     Xen_os.Eventchn.handle;
+  evtchn: Xen_os.Eventchn.t;
   ring:   Cstruct.t;
 }
 
@@ -80,7 +80,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
       stats.total_read <- stats.total_read + n;
       let seq = Int32.(add seq (of_int n)) in
       Console_ring.Ring.Front.Reader.advance t.ring seq;
-      OS.Eventchn.notify t.xe t.evtchn;
+      Xen_os.Eventchn.notify t.xe t.evtchn;
       A.after t.evtchn after >>= fun next ->
       read_the_ring next in
 
@@ -100,7 +100,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
             Cstruct.blit buffer 0 avail 0 n;
             let seq = Int32.(add seq (of_int n)) in
             Console_ring.Ring.Back.Writer.advance t.ring seq;
-            OS.Eventchn.notify t.xe t.evtchn;
+            Xen_os.Eventchn.notify t.xe t.evtchn;
             loop after (Cstruct.shift buffer n)
           end
         end in
@@ -113,20 +113,20 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
 
   let init xe domid ring_info c =
     let evtchn =
-      OS.Eventchn.bind_interdomain xe domid ring_info.RingInfo.event_channel
+      Xen_os.Eventchn.bind_interdomain xe domid ring_info.RingInfo.event_channel
     in
     let grant =
-      { OS.Xen.Import.domid = domid; ref = OS.Xen.Gntref.of_int32 ring_info.RingInfo.ref }
+      { Xen_os.Xen.Import.domid = domid; ref = Xen_os.Xen.Gntref.of_int32 ring_info.RingInfo.ref }
     in
-    match OS.Xen.Import.mapv [ grant ] ~writable:true with
+    match Xen_os.Xen.Import.mapv [ grant ] ~writable:true with
     | Error (`Msg s) -> failwith s
     | Ok mapping ->
-      let ring = Io_page.to_cstruct (OS.Xen.Import.Local_mapping.to_buf mapping) in
+      let ring = Io_page.to_cstruct (Xen_os.Xen.Import.Local_mapping.to_buf mapping) in
       let t = { domid; xe; evtchn; ring } in
       let stats = { total_read = 0; total_write = 0 } in
       let th = service_thread t c stats in
       Lwt.on_cancel th (fun () ->
-          let () = OS.Xen.Import.Local_mapping.unmap_exn mapping in ()
+          let () = Xen_os.Xen.Import.Local_mapping.unmap_exn mapping in ()
         );
       th, stats
 
@@ -197,7 +197,7 @@ module Make(A: ACTIVATIONS)(X: Xs_client_lwt.S)(C: CONSOLE) = struct
 
   let run (id: string) backend_name (domid,devid) =
     make () >>= fun client ->
-    let xe = OS.Eventchn.init () in
+    let xe = Xen_os.Eventchn.init () in
 
     C.connect id >>= fun t ->
     mk_backend_path client backend_name (domid,devid) >>= fun backend_path ->

@@ -25,7 +25,7 @@ module type ACTIVATIONS = sig
   val program_start: event
   (** represents an event which 'fired' when the program started *)
 
-  val after: OS.Eventchn.t -> event -> event Lwt.t
+  val after: Xen_os.Eventchn.t -> event -> event Lwt.t
   (** [next channel event] blocks until the system receives an event
       newer than [event] on channel [channel]. If an event is received
       while we aren't looking then this will be remembered and the
