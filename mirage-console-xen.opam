@@ -16,7 +16,7 @@ depends: [
   "mirage-flow"
   "mirage-console" {=version}
   "mirage-console-xen-proto" {=version}
-  "mirage-xen" {>= "6.0.0"}
+  "mirage-xen" {>= "7.0.0"}
 ]
 build: [
   ["dune" "subst"] {dev}
@@ -24,9 +24,3 @@ build: [
 ]
 dev-repo: "git+https://github.com/mirage/mirage-console.git"
 synopsis: "Implementation of Mirage console for Xen"
-pin-depends:[
-  [ "mirage-xen.dev" "git+https://github.com/dinosaure/mirage-xen.git#b7b5eaebead17a864b53085b60351a1648ba05b1" ]
-  [ "mirage-runtime.4.0.0" "git+https://github.com/mirage/mirage.git#59101cd795e741982a0a4580c113072339e1389b" ]
-  [ "functoria-runtime.4.0.0" "git+https://github.com/mirage/mirage.git#59101cd795e741982a0a4580c113072339e1389b" ]
-  [ "functoria.4.0.0" "git+https://github.com/mirage/mirage.git#59101cd795e741982a0a4580c113072339e1389b" ]
-]
