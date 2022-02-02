@@ -13,6 +13,7 @@ depends: [
   "xenstore"
   "shared-memory-ring"
   "lwt"
+  "cstruct" {>= "6.0.0"}
   "mirage-flow"
   "mirage-console" {=version}
   "mirage-console-xen-proto" {=version}
